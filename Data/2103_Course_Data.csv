@@ -1,0 +1,195 @@
+﻿course_name,intake,school_id,course_code,lower_bound,upper_bound
+Applied Chemistry,100,14,S64,5,9
+Biomedical Science,100,14,S98,3,7
+Chemical Engineering,120,14,S70,5,13
+Common Science Programme,0,14,S28,0,0
+Food Science & Technology,105,14,S47,5,13
+Perfumery & Cosmetic Science,50,14,S38,5,11
+Architecture,95,15,S66,5,13
+Civil Engineering,120,15,S68,7,20
+Facilities Management,75,15,S95,11,19
+Integrated Events & Project Management,100,15,S50,5,16
+Landscape Architecture,40,15,S94,8,15
+Accountancy,100,16,S75,3,12
+Banking & Finance,80,16,S76,6,12
+Business Administration,120,16,S71,4,12
+Common Business Programme,205,16,S31,4,12
+Human Resource Management with Psychology,100,16,S48,5,12
+Aeronautical Engineering,180,17,S88,5,17
+Aerospace Electronics,90,17,S90,7,13
+Common Engineering Programme,340,17,S40,7,17
+Computer Engineering,215,17,S53,3,12
+Electrical & Electronic Engineering,220,17,S99,6,17
+Engineering with Business,60,17,S42,5,11
+Mechanical Engineering,180,17,S91,4,17
+Mechatronics & Robotics,75,17,S73,5,13
+Optometry,60,18,S67,6,12
+Applied AI & Analytics,80,19,S30,3,8
+Common ICT Programme,165,19,S32,3,13
+Infocomm Security Management,120,19,S54,4,11
+Information Technology,160,19,S69,4,14
+Marine Engineering,115,20,S63,7,22
+Maritime Business,120,20,S74,7,18
+Nautical Studies,40,20,DNS,0,0
+Interior Design,60,21,S89,4,14
+Media Arts & Design,414,21,S29,4,12
+Diploma in Accountancy,135,22,N51,4,11
+Diploma in Banking & Finance,75,22,N53,4,11
+Diploma in Business Studies,150,22,N45,4,9
+Common Business Programme,220,22,N97,4,12
+Diploma in International Trade & Business,75,22,N85,6,12
+Diploma in Tourism & Resort Management,50,22,N72,5,13
+Diploma in Design,75,23,N12,6,14
+Diploma in Hotel & Leisure Facilities Management,95,23,N40,11,17
+Diploma in Real Estate Business,70,23,N48,9,15
+Diploma in Aerospace Engineering,100,24,N65,3,16
+Diploma in Automation & Mechatronic Systems,55,24,N50,7,20
+Diploma in Biomedical Engineering,60,24,N60,4,12
+Common Engineering Programme,350,24,N71,3,19
+Diploma in Electrical Engineering,95,24,N43,11,20
+Diploma in Electronic & Computer Engineering,135,24,N44,6,16
+Diploma in Engineering Science,50,24,N93,4,12
+Diploma in Marine & Offshore Technology,40,24,N42,13,18
+Diploma in Mechanical Engineering,120,24,N41,12,22
+Diploma in Film Sound & Video,55,25,N82,4,12
+Diploma in Mass Communication,110,25,N67,4,10
+Diploma in Media Post-Production,55,25,N13,6,13
+Diploma in Nursing,600,26,N69,4,28
+Diploma in Optometry,45,26,N83,9,13
+Diploma in Arts Business Management,40,27,N91,5,9
+Diploma in Chinese Media & Communication,40,27,N88,6,11
+Diploma in Chinese Studies,50,27,N70,7,13
+Diploma in Community Development,85,27,N11,4,10
+Diploma in Early Childhood Development & Education,500,27,N96,5,18
+Diploma in Tamil Studies with Early Education,30,27,N95,15,21
+Common ICT Programme,125,28,N98,6,13
+Diploma in Cybersecurity & Digital Forensics,50,28,N94,3,8
+Diploma in Data Science,50,28,N81,6,11
+Diploma in Immersive Media,50,28,N55,8,16
+Diploma in Information Technology,100,28,N54,6,15
+Diploma in Biomedical Science,85,29,N59,4,8
+Diploma in Chemical & Biomolecular Engineering,75,29,N56,6,11
+Diploma in Environmental & Water Technology,45,29,N74,5,14
+Diploma in Landscape Design & Horticulture,40,29,N57,8,16
+Diploma in Pharmaceutical Science,50,29,N73,5,9
+Chemical Engineering,150,8,T33,6,15
+Food Nutrition & Culinary Science,70,8,T26,8,14
+Medical Biotechnology,100,8,T64,3,10
+Pharmaceutical Science,100,8,T25,7,11
+Veterinary Technology,70,8,T45,3,10
+Accountancy & Finance,115,9,T02,4,13
+Business,170,9,T10,5,14
+Common Business Programme,300,9,T01,5,15
+Communications & Media Management,85,9,T40,3,13
+Culinary & Catering Management,70,9,T18,5,17
+Hospitality & Tourism Management,125,9,T08,9,18
+Law & Management,110,9,T09,6,11
+International Trade & Logistics,70,9,T07,8,17
+Marketing,75,9,T67,5,15
+Aerospace Electronics,75,10,T50,8,18
+Aerospace Engineering,100,10,T51,4,16
+Architectural Technology & Building Services,75,10,T29,6,16
+Aviation Management,75,10,T04,6,14
+Biomedical Engineering,100,10,T38,6,13
+Business Process & Systems Engineering,100,10,T43,8,18
+Common Engineering Programme,475,10,T56,7,22
+Computer Engineering,100,10,T13,5,13
+Electronics,50,10,T65,9,16
+Integrated Facility Management,100,10,T28,14,20
+Mechatronics,50,10,T66,11,16
+Early Childhood Development & Education,260,11,T68,5,20
+Psychology Studies,75,11,T48,3,8
+Social Sciences in Gerontology,50,11,T53,10,14
+Applied Artificial Intelligence,50,12,T69,5,12
+Big Data & Analytics,50,12,T60,6,12
+Common ICT Programme,195,12,T63,4,16
+Cybersecurity & Digital Forensics,150,12,T62,4,12
+Game Design & Development,50,12,T58,9,14
+Information Technology,100,12,T30,5,16
+Apparel Design & Merchandising,70,13,T20,6,11
+Communication Design,95,13,T59,6,15
+Digital Film & Television,75,13,T23,5,14
+Interior Architecture & Design,75,13,T22,8,14
+Product & Industrial Design,50,13,T35,9,17
+Biomedical Science,97,1,R14,8,11
+Biotechnology,85,1,R16,10,17
+Applied Chemistry,47,1,R17,11,17
+Pharmaceutical Science,148,1,R22,9,17
+Common Science Programme,186,1,R59,7,13
+Environmental & Marine Science,61,1,R62,7,18
+Industrial & Operations Management,80,2,R11,12,26
+Supply Chain Management,80,2,R21,11,25
+Aviation Management,84,2,R39,16,25
+Aerospace Engineering,95,2,R40,17,26
+Common Engineering Programme,285,2,R42,18,26
+Electrical & Electronic Engineering,123,2,R50,16,24
+Engineering Systems & Management,62,2,R54,16,24
+Engineering Design with Business,65,2,R56,13,26
+Sustainable Built Environment,50,2,R61,15,26
+Integrated Events Management,120,3,R28,15,26
+Customer Experience Management with Business   ,112,3,R34,12,21
+Hotel & Hospitality Management   ,100,3,R37,14,26
+Restaurant & Culinary Operations,60,3,R46,10,26
+Information Technology ,125,4,R12,15,26
+Business Information Systems  ,118,4,R13,15,26
+Financial Technology,115,4,R18,15,26
+Digital Design & Development,75,4,R47,13,24
+Infocomm Security Management,84,4,R55,13,22
+Common ICT Programme ,215,4,R58,16,26
+Sport & Exercise Science,97,5,R26,6,16
+Outdoor & Adventure Learning ,45,5,R33,18,26
+Health Management & Promotion ,75,5,R43,13,26
+Health Services Management ,75,5,R45,16,26
+Sport Coaching,44,5,R49,10,18
+Common Sports and Health Programme,141,5,R63,11,26
+Mass Communication,115,6,R32,9,16
+Consumer Behaviour & Research,69,6,R48,13,18
+Human Resource Management with Psychology ,70,6,R52,11,16
+"Common Business Programme	",276,6,R57,13,26
+Business,125,6,R60,15,21
+Media Production & Design   ,118,7,R19,10,18
+Sonic Arts,70,7,R24,5,19
+Arts & Theatre Management   ,70,7,R25,6,20
+Design for Games & Gamification,67,7,R35,12,17
+Design for User Experience,75,7,R36,16,20
+Diploma In Pharmaceutical Science,83,30,C65,5,10
+Diploma In Applied Chemistry,46,30,C45,5,11
+Diploma In Food Science & Nutrition,68,30,C69,4,13
+Diploma In Biologics & Process Technology,46,30,C49,6,12
+Diploma In Chemical & Pharmaceutical Technology,112,30,C73,9,15
+Diploma In Food & Beverage Business,65,31,C46,6,16
+Diploma In Business Management,254,31,C94,8,16
+Common Business Programme,255,31,C34,7,16
+Diploma In Banking And Finance,65,31,C96,7,13
+Diploma In Sport & Wellness Management,45,31,C81,7,15
+Diploma In Accountancy & Finance,69,31,C98,7,12
+Diploma In Hospitality & Tourism Management,56,31,C67,9,17
+Diploma In Mass Media Management,50,31,C93,9,12
+Diploma In Architecture,50,32,C38,8,15
+Diploma In Visual Communication,68,32,C63,5,15
+Diploma In Experiential Product & Interior Design,105,32,C32,9,17
+Diploma In Digital Game Art & Design,66,32,C60,10,14
+Diploma In Interaction Design,50,32,C59,9,17
+Diploma In Motion Graphics Design,50,32,C66,10,14
+Diploma In Animation & Visual Effects,113,32,C33,5,12
+Diploma In Game Development & Technology,86,32,C70,0,0
+Diploma In Advanced & Digital Manufacturing,64,33,C62,0,0
+Common Engineering Programme,424,33,C42,6,26
+Diploma In Engineering With Business,41,33,C41,8,14
+Diploma In Nanotechnology & Materials Science,40,33,C50,7,14
+Diploma In Robotics & Mechatronics,64,33,C87,8,23
+Diploma In Biomedical Engineering,40,33,C71,9,13
+Diploma In Aeronautical & Aerospace Technology,41,33,C51,5,16
+Diploma In Aerospace Systems & Management,41,33,C52,8,19
+Diploma In Electronic & Computer Engineering,83,33,C89,6,18
+Diploma In Infocomm & Media Engineering,130,33,C75,11,22
+Diploma In Ai & Data Engineering,40,33,C31,0,0
+Diploma In Social Work,45,34,C47,4,9
+Diploma In Oral Health Therapy,25,35,C72,8,11
+Diploma In Nursing,800,35,C97,5,28
+Diploma In Business Intelligence & Analytics,55,35,C43,6,11
+Common Ict Programme,142,35,C36,4,15
+Diploma In Infocomm & Security,64,35,C80,9,16
+Diploma In Business & Financial Technology,86,35,C35,10,15
+Diploma In Cybersecurity & Digital Forensics,75,35,C54,3,9
+Diploma In Information Technology,102,35,C85,6,14
