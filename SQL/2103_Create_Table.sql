@@ -65,3 +65,30 @@ CREATE TABLE IF NOT EXISTS Scholarship_Criteria (
 	FOREIGN KEY (scholarship_id) REFERENCES scholarship(scholarship_id),
     FOREIGN KEY (criteria_id) REFERENCES criteria(criteria_id)
 );
+
+CREATE TABLE IF NOT EXISTS Users (
+	user_id int NOT NULL AUTO_INCREMENT,
+	username varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
+	PRIMARY KEY (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS Comments (
+	comment_id int NOT NULL AUTO_INCREMENT,
+	description varchar(255),
+    course_id int NOT NULL,
+    user_id int NOT NULL,
+	PRIMARY KEY (comment_id),
+	FOREIGN KEY (course_id) REFERENCES Course(course_id),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS Vote (
+	vote_id int NOT NULL AUTO_INCREMENT,
+	user_id int NOT NULL,
+    comment_id int NOT NULL,
+    vote_value int NOT NULL,
+	PRIMARY KEY (vote_id),
+	FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (comment_id) REFERENCES criteria(criteria_id)
+);
