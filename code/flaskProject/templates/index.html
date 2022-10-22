@@ -67,6 +67,18 @@
         <label for="NYP">Republic Polytechnic</label><br>
         <input type="checkbox" name="TP" value="TP">
         <label for="NYP">Temasek Polytechnic</label><br>
-    <button type="submit">Submit</button>
+        <input type="submit" id="eligible-course" name="eligible-course">
+    </form>
+
+    <form method="post">
+        <p>Find courses from polytechnic</p>
+        <select id="poly-names" name="poly-names">
+            <option value="SP">Singapore Polytechnic</option>
+            <option value="NYP">Nanyang Polytechnic</option>
+            <option value="NP">Ngee Ann Polytechnic</option>
+            <option value="RP">Republic Polytechnic</option>
+            <option value="TP">Temasek Polytechnic</option>
+        </select></td>
+        <input type="submit" id="poly-course" name="poly-course">
     </form>
 {% endblock %}

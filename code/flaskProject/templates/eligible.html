@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Courses Eligible</title>
+    {% if aggregate %}
     <p>Your aggregate score: {{ aggregate }}</p>
+    {% endif %}
+    {% if school %}
     <p>Showing {{ school }}</p>
+    {% endif %}
     <table>
         <tr>
             <td>Course code</td>
