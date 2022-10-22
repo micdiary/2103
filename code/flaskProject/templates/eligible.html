@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <title>Courses Eligible</title>
     <p>Your aggregate score: {{ aggregate }}</p>
+    <p>Showing {{ school }}</p>
     <table>
         <tr>
             <td>Course code</td>
             <td>Course name</td>
             <td>School name</td>
             <td>Polytechnic</td>
-            <td>Upper Bound</td>
             <td>Lower Bound</td>
+            <td>Upper Bound</td>
         </tr>
         {% for item in eligibleCourses %}
             <tr></tr>
