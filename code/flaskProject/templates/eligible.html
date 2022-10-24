@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <title>Courses Eligible</title>
     {% if aggregate %}
-    <p>Your aggregate score: {{ aggregate }}</p>
+        <p>Your aggregate score: {{ aggregate }}</p>
     {% endif %}
     {% if school %}
-    <p>Showing {{ school }}</p>
+        <p>Showing {{ school }}</p>
     {% endif %}
     <table>
         <tr>
             <td>Course code</td>
             <td>Course name</td>
-            <td>School name</td>
+            {% if schoolQuery %}
+                <td>School name</td>
+            {% endif %}
             <td>Polytechnic</td>
             <td>Lower Bound</td>
             <td>Upper Bound</td>
@@ -22,7 +24,9 @@
             <tr></tr>
             <td>{{ item[0] }}</td>
             <td>{{ item[1] }}</td>
-            <td>{{ item[2] }}</td>
+            {% if schoolQuery %}
+                <td>{{ item[2] }}</td>
+            {% endif %}
             <td>{{ item[3] }}</td>
             <td>{{ item[4] }}</td>
             <td>{{ item[5] }}</td>

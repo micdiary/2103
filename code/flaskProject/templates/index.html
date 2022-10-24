@@ -86,18 +86,17 @@
 
 
 
-    <form name="form1" id="form1" action="post">
+    <form method="post">
         <p>Find courses from school</p>
         Polytechnic: <select name="poly" id="poly">
         <option value="" selected="selected">Select Polytechnic</option>
     </select>
         <br><br>
-        School: <select name="school" id="school">
-        <option value="" selected="selected">Please select polytechnic first</option>
+        School: <select name="school" id="school" required>
+        <option value="" selected="selected" >Please select polytechnic first</option>
     </select>
         <br><br>
-
-        <input type="submit" value="Submit">
+        <input type="submit" id="school-course" name="school-course">
     </form>
 {% endblock %}
 

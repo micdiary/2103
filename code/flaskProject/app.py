@@ -14,6 +14,7 @@ passwd = 'root'
 database = '2103_db'
 app.debug = True
 
+
 def connectToDB(sqlCommand):
     print(sqlCommand)
     mydb = mysql.connector.connect(
@@ -30,6 +31,7 @@ def connectToDB(sqlCommand):
     mycursor.close()
     return DBData
 
+
 @app.before_request
 def before_request():
     g.user = None
@@ -37,7 +39,8 @@ def before_request():
     if 'user' in session:
         g.user = session['user']
 
-#main page
+
+# main page
 @app.route('/', methods=["GET", "POST"])
 def index():  # put application's code here
 
@@ -46,13 +49,13 @@ def index():  # put application's code here
         if "login-attempt" in request.form:
             username = request.form['username']
             password = request.form['password']
-            sqlQuery = "SELECT 1 from users WHERE username = "+"'"+username+"'"+" AND password = "+"'"+password+"'"
+            sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'" + " AND password = " + "'" + password + "'"
             authUser = connectToDB(sqlQuery)
             print(authUser)
             session.pop('user', None)
             if authUser:
                 session['user'] = username
-                return render_template("index.html", login = username)
+                return render_template("index.html", login=username)
             return render_template("index.html")
 
         if "eligible-course" in request.form:
@@ -62,7 +65,8 @@ def index():  # put application's code here
                 request.form["grade4"]) + int(request.form["grade5"])
             sqlQuery = "SELECT course_code, course_name, school_name, poly_name, lower_bound, upper_bound " \
                        "FROM course C, school S, polytechnic P " \
-                       "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id" + " AND upper_bound >= " + str(aggregate)
+                       "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id" + " AND upper_bound >= " + str(
+                aggregate)
             # get filter conditions
             schoolFilter = []
             if request.form.get('NYP') == 'NYP':
@@ -81,41 +85,62 @@ def index():  # put application's code here
                 school = ""
                 for i in schoolFilter:
                     if i != schoolFilter[-1]:
-                        filterQuery += "'"+i+"',"
+                        filterQuery += "'" + i + "',"
                         school += i + ", "
                     else:
-                        filterQuery += "'"+i+"')"
+                        filterQuery += "'" + i + "')"
                         school += i
-                sqlQuery += " AND poly_name IN "+filterQuery
+                sqlQuery += " AND poly_name IN " + filterQuery
 
             # get sql data
-            eligibleCourses = connectToDB(sqlQuery+" ORDER BY poly_name, upper_bound ASC")
+            eligibleCourses = connectToDB(sqlQuery + " ORDER BY poly_name, upper_bound ASC")
 
-            return render_template("eligible.html", aggregate=aggregate , eligibleCourses = eligibleCourses, school = school)
+            return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school)
 
         # specific poly courses form
         if "poly-course" in request.form:
-
-            polytechnic = "'"+request.form["poly-names"]+"'"
+            polytechnic = "'" + request.form["poly-names"] + "'"
             sqlQuery = "SELECT course_code, course_name, school_name, poly_name, lower_bound, upper_bound " \
                        "FROM course C, school S, polytechnic P " \
-                       "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id AND poly_name = "+ polytechnic
+                       "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id AND poly_name = " + polytechnic
             DBdata = connectToDB(sqlQuery)
-            return render_template("eligible.html", eligibleCourses = DBdata)
+            return render_template("eligible.html", eligibleCourses=DBdata)
+        # specific school courses form
+        if "school-course" in request.form:
 
+            polyNames = request.form["poly"].split()
+            poly = ""
+            for i in polyNames:
+                poly += i[0]
+            print(poly)
+            if poly == 'NP':
+                poly = 'NYP'
+            elif poly == 'NAP':
+                poly = 'NP'
+
+            school = request.form["school"]
+            sqlQuery = ("SELECT course_code, course_name, poly_name, lower_bound, upper_bound " \
+                      "FROM course C, school S, polytechnic P " \
+                      "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id AND poly_name = '%s' AND school_name = '%s'"%(poly,school))
+            print(sqlQuery)
+            DBdata = connectToDB(sqlQuery)
+            return render_template("eligible.html", eligibleCourses=DBdata, schoolQuery = True)
     return render_template("index.html")
 
-#user can choose to login or not (must login if want to comment)
+
+# user can choose to login or not (must login if want to comment)
 @app.route('/login')
 def login():
     return 'login sucess'
 
-#redirect from first form
+
+# redirect from first form
 @app.route('/eligible')
 def eligible_courses():
     return 'courses eligible'
 
-#redirect from second form
+
+# redirect from second form
 @app.route('/scholarships')
 def scholarships_offered():
     return 'scholarships offered'

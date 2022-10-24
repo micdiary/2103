@@ -1,13 +1,13 @@
 var subjectObject = {
   "Singapore Polytechnic": {
-    "School of Applied Sciences": [],
-    "School of Bulit Environment": [],
-    "School of Business Management": [],
-      "School of Engineering": [],
-      "School of Health Sciences": [],
-      "School of Information & Digital Technologies": [],
-      "School of Maritime Studies": [],
-      "School of Media & Design": []
+    "Applied Sciences": [],
+    "Bulit Environment": [],
+    "Business Management": [],
+      "Engineering": [],
+      "Health Sciences": [],
+      "Information & Digital Technologies": [],
+      "Maritime Studies": [],
+      "Media & Design": []
   },
   "Nanyang Polytechnic": {
     "School Of Applied Science": [],
