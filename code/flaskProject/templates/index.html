@@ -1,5 +1,16 @@
 ﻿{% block title %}Home{% endblock %}
 {% block content %}
+
+
+    {% if not login %}
+        <form method="post">
+            Username: <input name="username">
+            Password: <input name="password">
+            <input type="submit" id="login-attempt" name="login-attempt" value="login">
+        </form>
+    {% else %}
+        <p> Welcome back {{ login }}</p>
+    {% endif %}
     <p>Eligible Courses based off your ELB2R2</p>
     <form method="post">
         <table>

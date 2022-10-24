@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, g
 import mysql.connector
+import os
 
 app = Flask(__name__)
+
+app.secret_key = os.urandom(24)
 ###########################################################
 # change to your own mySQL credentials and database names or it wont connect to your DB
 ###########################################################
@@ -26,12 +29,32 @@ def connectToDB(sqlCommand):
     DBData = mycursor.fetchall()
     mycursor.close()
     return DBData
+
+@app.before_request
+def before_request():
+    g.user = None
+
+    if 'user' in session:
+        g.user = session['user']
+
 #main page
 @app.route('/', methods=["GET", "POST"])
 def index():  # put application's code here
 
     if request.method == "POST":
         # eligible courses form
+        if "login-attempt" in request.form:
+            username = request.form['username']
+            password = request.form['password']
+            sqlQuery = "SELECT 1 from users WHERE username = "+"'"+username+"'"+" AND password = "+"'"+password+"'"
+            authUser = connectToDB(sqlQuery)
+            print(authUser)
+            session.pop('user', None)
+            if authUser:
+                session['user'] = username
+                return render_template("index.html", login = username)
+            return render_template("index.html")
+
         if "eligible-course" in request.form:
             # get total aggregate
             school = "all polytechnics"
