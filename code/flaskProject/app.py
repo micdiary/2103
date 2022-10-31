@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, session, g
+from flask import Flask, render_template, request, session, g, redirect, url_for
 import mysql.connector
 import os
+import json
 
 app = Flask(__name__)
 
@@ -27,7 +28,7 @@ def connectToDB(sqlCommand):
     mycursor = mydb.cursor()
 
     mycursor.execute(sqlCommand)
-    DBData = mycursor.fetchall()
+    DBData = json.dumps(mycursor.fetchall())
     mycursor.close()
     return DBData
 
@@ -95,16 +96,10 @@ def index():  # put application's code here
             # get sql data
             eligibleCourses = connectToDB(sqlQuery + " ORDER BY poly_name, upper_bound ASC")
 
-            return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school)
+            return redirect(url_for('eligible_courses',  aggregate=aggregate, DBdata=eligibleCourses, school=school))
+            #return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school)
 
-        # specific poly courses form
-        if "poly-course" in request.form:
-            polytechnic = "'" + request.form["poly-names"] + "'"
-            sqlQuery = "SELECT course_code, course_name, school_name, poly_name, lower_bound, upper_bound " \
-                       "FROM course C, school S, polytechnic P " \
-                       "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id AND poly_name = " + polytechnic
-            DBdata = connectToDB(sqlQuery)
-            return render_template("eligible.html", eligibleCourses=DBdata)
+
         # specific school courses form
         if "school-course" in request.form:
 
@@ -124,27 +119,60 @@ def index():  # put application's code here
                       "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id AND poly_name = '%s' AND school_name = '%s'"%(poly,school))
             print(sqlQuery)
             DBdata = connectToDB(sqlQuery)
-            return render_template("eligible.html", eligibleCourses=DBdata, schoolQuery = True)
+
+            return redirect(url_for('eligible_courses', DBdata=DBdata, schoolQuery = True))
+            #return render_template("eligible.html", schoolQuery=True, eligibleCourses=DBdata)
     return render_template("index.html")
 
 
 # user can choose to login or not (must login if want to comment)
 @app.route('/login')
 def login():
+
     return 'login sucess'
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('index'))
 
 
 # redirect from first form
 @app.route('/eligible')
 def eligible_courses():
-    return 'courses eligible'
+    try:
+        if session['user']:
+            login = session['user']
+    except:
+        login = False
 
+
+    eligibleCourses = json.loads(request.args.get('DBdata'))
+    schoolQuery = request.args.get('schoolQuery')
+    school = request.args.get('aggregate')
+    aggregate = request.args.get('school')
+    if schoolQuery:
+        return render_template("eligible.html", schoolQuery = schoolQuery , eligibleCourses = eligibleCourses, login = login )
+    elif school:
+        return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school, login = login)
+
+
+    return render_template("eligible.html")
 
 # redirect from second form
 @app.route('/scholarships')
 def scholarships_offered():
     return 'scholarships offered'
 
+@app.route('/eligible/comments', methods=['GET', 'POST'])
+def comments():
+    course_code = "'"+request.args.get('comment')+"'"
+    print(course_code)
+    sqlQuery = "SELECT description, username" \
+               " FROM comments C2, course C1, users" \
+               " WHERE C1.course_id = C2.course_id and C1.course_code = "+ course_code
+    DBdata = json.loads(connectToDB(sqlQuery))
+    return render_template("comments.html", courseComments = DBdata)
 
 if __name__ == '__main__':
     app.run()
