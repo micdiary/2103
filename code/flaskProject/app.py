@@ -56,6 +56,9 @@ def before_request():
 def index():  # put application's code here
     login = validateLogin()
     if request.method == "POST":
+        if "sign-up" in request.form:
+            return redirect(url_for('sign_up'))
+
 
         if "eligible-course" in request.form:
             # get total aggregate
@@ -123,7 +126,22 @@ def index():  # put application's code here
 
     return render_template("index.html",login = login )
 
+@app.route('/signup', methods=["GET", "POST"])
+def sign_up():  # put application's code here
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+        sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'"
+        userExists = json.loads(connectToDB(sqlQuery))
 
+        if userExists:
+            flash("existing username")
+        else:
+            insertSQL = "INSERT INTO users ( username, password) VALUES ('%s' , '%s' );" % (username, password)
+            connectToDB(insertSQL)
+            session['user'] = username
+            return redirect(url_for('index'))
+    return render_template("signup.html")
 # user can choose to login or not (must login if want to comment)
 @app.route('/login' , methods=['POST'])
 def login():
@@ -209,9 +227,12 @@ def comments():
                    " WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id and course_code = "+ course_code
 
     # get sql of comments
-    sqlQuery = "SELECT description, username" \
-               " FROM comments C2, course C1, users" \
-               " WHERE C1.course_id = C2.course_id and C1.course_code = "+ course_code
+    sqlQuery = "SELECT description, username " \
+               "FROM comments C1, users U, course C2 " \
+               "WHERE U.user_id = C1.user_id " \
+               "AND U.user_id = C1.user_id " \
+               "AND C1.course_id = C2.course_id AND course_code = " +course_code +" " \
+               "ORDER BY comment_id ASC"
     commentData = json.loads(connectToDB(sqlQuery))
     courseData = json.loads(connectToDB(coursesqlQuery))
     print(courseData)
