@@ -4,9 +4,18 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 <body>
 {% if not login %}
-    <form method="post">
+    <form action="/login" method="post">
         Username: <input name="username">
         Password: <input name="password">
         <input type="submit" id="login-attempt" name="login-attempt" value="login">
@@ -15,6 +24,27 @@
     <p> Hi {{ login }}</p>
     <a href={{ url_for('logout') }}>logout</a>
 {% endif %}
+<table>
+    <tr>
+        <td>Course code</td>
+        <td>Course name</td>
+        <td>School</td>
+        <td>Polytechnic</td>
+        <td>Lower Bound</td>
+        <td>Upper Bound</td>
+    </tr>
+    <tr>
+        {% for item in chosenCourse %}
+            <td>{{ item[0] }}</td>
+            <td>{{ item[1] }}</td>
+            <td>{{ item[2] }}</td>
+            <td>{{ item[3] }}</td>
+            <td>{{ item[4] }}</td>
+            <td>{{ item[5] }}</td>
+        {% endfor %}
+    </tr>
+</table>
+<h2>Comment section</h2>
 <table>
     {% for item in courseComments %}
         <tr>
@@ -27,5 +57,13 @@
     {% endfor %}
 </table>
 
+<form method="post">
+<textarea rows="4" cols="50" name="textbox" >
+Enter text here...</textarea>
+    {% for item in chosenCourse %}
+    <input type="hidden" name="course-code" value={{ item[0] }}>
+    {% endfor %}
+    <input type="submit">
+</form>
 </body>
 </html>

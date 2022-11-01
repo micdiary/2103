@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
     <meta charset="UTF-8">
     {% if not login %}
-        <form method="post">
+        <form action="/login" method="post">
             Username: <input name="username">
             Password: <input name="password">
             <input type="submit" id="login-attempt" name="login-attempt" value="login">

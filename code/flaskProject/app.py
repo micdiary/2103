@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, g, redirect, url_for
+from flask import Flask, render_template, request, session, g, redirect, url_for, flash
 import mysql.connector
 import os
 import json
@@ -32,6 +32,14 @@ def connectToDB(sqlCommand):
     mycursor.close()
     return DBData
 
+def validateLogin():
+    try:
+        if session['user']:
+            login = session['user']
+    except:
+        login = False
+
+    return login
 
 @app.before_request
 def before_request():
@@ -44,20 +52,21 @@ def before_request():
 # main page
 @app.route('/', methods=["GET", "POST"])
 def index():  # put application's code here
-
+    login = validateLogin()
     if request.method == "POST":
+
         # eligible courses form
-        if "login-attempt" in request.form:
-            username = request.form['username']
-            password = request.form['password']
-            sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'" + " AND password = " + "'" + password + "'"
-            authUser = connectToDB(sqlQuery)
-            print(authUser)
-            session.pop('user', None)
-            if authUser:
-                session['user'] = username
-                return render_template("index.html", login=username)
-            return render_template("index.html")
+        # if "login-attempt" in request.form:
+        #     username = request.form['username']
+        #     password = request.form['password']
+        #     sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'" + " AND password = " + "'" + password + "'"
+        #     authUser = connectToDB(sqlQuery)
+        #     print(authUser)
+        #     session.pop('user', None)
+        #     if authUser:
+        #         session['user'] = username
+        #         return render_template("index.html", login=username)
+        #     return render_template("index.html")
 
         if "eligible-course" in request.form:
             # get total aggregate
@@ -96,7 +105,7 @@ def index():  # put application's code here
             # get sql data
             eligibleCourses = connectToDB(sqlQuery + " ORDER BY poly_name, upper_bound ASC")
 
-            return redirect(url_for('eligible_courses',  aggregate=aggregate, DBdata=eligibleCourses, school=school))
+            return redirect(url_for('eligible_courses',  aggregate=aggregate, DBdata=eligibleCourses, school=school, login=login))
             #return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school)
 
 
@@ -120,15 +129,29 @@ def index():  # put application's code here
             print(sqlQuery)
             DBdata = connectToDB(sqlQuery)
 
-            return redirect(url_for('eligible_courses', DBdata=DBdata, schoolQuery = True))
+            return redirect(url_for('eligible_courses', DBdata=DBdata, schoolQuery = True, login = login))
             #return render_template("eligible.html", schoolQuery=True, eligibleCourses=DBdata)
-    return render_template("index.html")
+
+    return render_template("index.html",login = login )
 
 
 # user can choose to login or not (must login if want to comment)
-@app.route('/login')
+@app.route('/login' , methods=['POST'])
 def login():
-
+    if request.method == "POST":
+        # eligible courses form
+        if "login-attempt" in request.form:
+            username = request.form['username']
+            password = request.form['password']
+            sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'" + " AND password = " + "'" + password + "'"
+            authUser = json.loads(connectToDB(sqlQuery))
+            session.pop('user', None)
+            if authUser:
+                session['user'] = username
+                return redirect(request.referrer)
+            else:
+                flash("wrong credentials")
+                return redirect(request.referrer)
     return 'login sucess'
 
 @app.route('/logout')
@@ -140,11 +163,8 @@ def logout():
 # redirect from first form
 @app.route('/eligible')
 def eligible_courses():
-    try:
-        if session['user']:
-            login = session['user']
-    except:
-        login = False
+    # check if user logged in
+    login = validateLogin()
 
 
     eligibleCourses = json.loads(request.args.get('DBdata'))
@@ -166,13 +186,47 @@ def scholarships_offered():
 
 @app.route('/eligible/comments', methods=['GET', 'POST'])
 def comments():
+    # check if user logged in
+    login = validateLogin()
+
+    # insert comments into db
+    if request.method == "POST":
+        print("getting comment and courseNumber")
+        comment = request.form['textbox']
+        courseNo = request.form['course-code']
+        print("comment: "+ comment)
+        print("courseNo: " + courseNo)
+    # check if logged in
+        if comment and login:
+            courseID = json.loads(connectToDB("SELECT course_id FROM course WHERE course_code = '%s'"%(courseNo)))
+            userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'"%(login)))
+            print(courseID[0][0])
+            print(userID[0][0])
+            insertSQL = ("INSERT INTO comments ( description, course_id, user_id) VALUES ('%s' , %d , %d);"%(comment,courseID[0][0], userID[0][0]))
+            test = connectToDB(insertSQL)
+            print("test: "+test)
+            return redirect(request.url)
+        else:
+            flash('Must be logged in to comment')
+            print("login fail")
+            return redirect(request.url)
+    # retrieve comments section
     course_code = "'"+request.args.get('comment')+"'"
     print(course_code)
+    # get sql of course
+    coursesqlQuery = "SELECT course_code, course_name,  school_name , poly_name, lower_bound, upper_bound" \
+                   " FROM course C, school S, polytechnic P " \
+                   " WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id and course_code = "+ course_code
+
+    # get sql of comments
     sqlQuery = "SELECT description, username" \
                " FROM comments C2, course C1, users" \
                " WHERE C1.course_id = C2.course_id and C1.course_code = "+ course_code
-    DBdata = json.loads(connectToDB(sqlQuery))
-    return render_template("comments.html", courseComments = DBdata)
+    commentData = json.loads(connectToDB(sqlQuery))
+    courseData = json.loads(connectToDB(coursesqlQuery))
+    print(courseData)
+    #my_url = url_for('search_bp.search', book=book, author=author)
+    return render_template("comments.html", courseComments = commentData, chosenCourse = courseData, login = login )
 
 if __name__ == '__main__':
     app.run()

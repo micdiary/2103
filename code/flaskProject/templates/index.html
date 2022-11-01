@@ -1,11 +1,20 @@
 ﻿
 <script src="{{url_for('static', filename='js/cascading.js')}}"></script>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 {% block title %}Home{% endblock %}
 {% block content %}
 
 
     {% if not login %}
-        <form method="post">
+        <form action="/login" method="post">
             Username: <input name="username">
             Password: <input name="password">
             <input type="submit" id="login-attempt" name="login-attempt" value="login">
