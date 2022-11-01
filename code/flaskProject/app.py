@@ -17,7 +17,7 @@ app.debug = True
 
 
 def connectToDB(sqlCommand):
-    print(sqlCommand)
+    print("sql command: "+sqlCommand)
     mydb = mysql.connector.connect(
         host=host,
         user=user,
@@ -28,6 +28,8 @@ def connectToDB(sqlCommand):
     mycursor = mydb.cursor()
 
     mycursor.execute(sqlCommand)
+    if 'INSERT' in sqlCommand:
+        mydb.commit()
     DBData = json.dumps(mycursor.fetchall())
     mycursor.close()
     return DBData
@@ -54,19 +56,6 @@ def before_request():
 def index():  # put application's code here
     login = validateLogin()
     if request.method == "POST":
-
-        # eligible courses form
-        # if "login-attempt" in request.form:
-        #     username = request.form['username']
-        #     password = request.form['password']
-        #     sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'" + " AND password = " + "'" + password + "'"
-        #     authUser = connectToDB(sqlQuery)
-        #     print(authUser)
-        #     session.pop('user', None)
-        #     if authUser:
-        #         session['user'] = username
-        #         return render_template("index.html", login=username)
-        #     return render_template("index.html")
 
         if "eligible-course" in request.form:
             # get total aggregate
@@ -202,9 +191,10 @@ def comments():
             userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'"%(login)))
             print(courseID[0][0])
             print(userID[0][0])
-            insertSQL = ("INSERT INTO comments ( description, course_id, user_id) VALUES ('%s' , %d , %d);"%(comment,courseID[0][0], userID[0][0]))
+            insertSQL = "INSERT INTO comments ( description, course_id, user_id) VALUES ('%s' , %d , %d);"%(comment,courseID[0][0], userID[0][0])
+            print("insertSQl: " + insertSQL)
             test = connectToDB(insertSQL)
-            print("test: "+test)
+
             return redirect(request.url)
         else:
             flash('Must be logged in to comment')

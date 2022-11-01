@@ -19,6 +19,9 @@
             Password: <input name="password">
             <input type="submit" id="login-attempt" name="login-attempt" value="login">
         </form>
+        <form  method="post">
+            <input type="submit" name="sign-up" value="signup">
+        </form>
     {% else %}
         <p> Welcome back {{ login }}</p>
         <a href={{ url_for('logout') }}>logout</a>
