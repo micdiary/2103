@@ -17,7 +17,6 @@ app.debug = True
 
 
 def connectToDB(sqlCommand):
-    print("sql command: "+sqlCommand)
     mydb = mysql.connector.connect(
         host=host,
         user=user,
@@ -28,7 +27,8 @@ def connectToDB(sqlCommand):
     mycursor = mydb.cursor()
 
     mycursor.execute(sqlCommand)
-    if 'INSERT' in sqlCommand:
+    if ('INSERT') in sqlCommand or ('DELETE') in sqlCommand:
+        print("sql command: " + sqlCommand)
         mydb.commit()
     DBData = json.dumps(mycursor.fetchall())
     mycursor.close()
@@ -191,6 +191,72 @@ def eligible_courses():
 def scholarships_offered():
     return 'scholarships offered'
 
+# try to combine /upvote and /downvote with this
+@app.route('/vote/<upOrDown>', methods=['GET','POST'])
+def vote(upOrDown):
+    print("test")
+    return redirect(request.referrer)
+
+
+@app.route('/upvote', methods=['GET','POST'])
+def upvote():
+    # check if user logged in
+    login = validateLogin()
+    print("test")
+    if request.method == "POST":
+        upvoted = int(request.form['upvote'])
+
+        if upvoted and login:
+            userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'" % (login)))
+            userID = int(userID[0][0])
+            # check if user voted before
+            upvotedBefore = json.loads(connectToDB("SELECT 1 FROM vote WHERE comment_id = %d AND user_id = %d AND vote_value = 1" % (upvoted,userID)))
+
+            if upvotedBefore:
+                flash("You can only vote a comment once")
+            # else upvote
+            else:
+                # delete downvote if exists
+                deleteDownvote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d;" % (userID, upvoted)
+                insertUpvote = "INSERT INTO vote ( user_id, comment_id, vote_value) VALUES (%d , %d , 1);"%(userID,upvoted)
+                connectToDB(deleteDownvote)
+                connectToDB(insertUpvote)
+            return redirect(request.referrer)
+        else:
+            flash('Must be logged in to upvote')
+            return redirect(request.referrer)
+
+    return redirect(request.referrer)
+
+@app.route('/downvote',  methods=['GET','POST'])
+def downvote():
+    # check if user logged in
+    print("test2")
+    login = validateLogin()
+    if request.method == "POST":
+        downvoted = int(request.form['downvote'])
+
+        if downvoted and login:
+            userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'" % (login)))
+            userID = int(userID[0][0])
+            # check if user voted before
+            downvotedBefore = json.loads(connectToDB("SELECT 1 FROM vote WHERE comment_id = %d AND user_id = %d AND vote_value = -1" % (downvoted,userID)))
+            if downvotedBefore:
+                flash("You can only vote a comment once")
+            # else upvote
+            else:
+                # delete downvote if exists
+                deleteUpvote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d;" % (userID, downvoted)
+                insertDownvote = "INSERT INTO vote ( user_id, comment_id, vote_value) VALUES (%d , %d , -1);"%(userID,downvoted)
+                connectToDB(deleteUpvote)
+                connectToDB(insertDownvote)
+            return redirect(request.referrer)
+        else:
+            flash('Must be logged in to upvote')
+            return redirect(request.referrer)
+
+    return redirect(request.referrer)
+
 @app.route('/eligible/comments', methods=['GET', 'POST'])
 def comments():
     # check if user logged in
@@ -211,30 +277,34 @@ def comments():
             print(userID[0][0])
             insertSQL = "INSERT INTO comments ( description, course_id, user_id) VALUES ('%s' , %d , %d);"%(comment,courseID[0][0], userID[0][0])
             print("insertSQl: " + insertSQL)
-            test = connectToDB(insertSQL)
+            connectToDB(insertSQL)
 
             return redirect(request.url)
         else:
             flash('Must be logged in to comment')
             print("login fail")
             return redirect(request.url)
+
     # retrieve comments section
     course_code = "'"+request.args.get('comment')+"'"
     print(course_code)
     # get sql of course
-    coursesqlQuery = "SELECT course_code, course_name,  school_name , poly_name, lower_bound, upper_bound" \
+    courseSQLQuery = "SELECT course_code, course_name,  school_name , poly_name, lower_bound, upper_bound" \
                    " FROM course C, school S, polytechnic P " \
                    " WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id and course_code = "+ course_code
 
     # get sql of comments
-    sqlQuery = "SELECT description, username " \
+    commentsSQLQuery = "SELECT description, username, comment_id " \
                "FROM comments C1, users U, course C2 " \
                "WHERE U.user_id = C1.user_id " \
                "AND U.user_id = C1.user_id " \
                "AND C1.course_id = C2.course_id AND course_code = " +course_code +" " \
                "ORDER BY comment_id ASC"
-    commentData = json.loads(connectToDB(sqlQuery))
-    courseData = json.loads(connectToDB(coursesqlQuery))
+    # get vote of comments
+    #voteSQLQuery = "SELECT SUM(vote_value) FROM vote WHERE comment_id = %d"
+
+    commentData = json.loads(connectToDB(commentsSQLQuery))
+    courseData = json.loads(connectToDB(courseSQLQuery))
     print(courseData)
     #my_url = url_for('search_bp.search', book=book, author=author)
     return render_template("comments.html", courseComments = commentData, chosenCourse = courseData, login = login )
