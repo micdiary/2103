@@ -1,13 +1,12 @@
-﻿
-<script src="{{url_for('static', filename='js/cascading.js')}}"></script>
+﻿<script src="{{ url_for('static', filename='js/cascading.js') }}"></script>
 {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+    {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endwith %}
 {% block title %}Home{% endblock %}
 {% block content %}
@@ -19,7 +18,7 @@
             Password: <input name="password">
             <input type="submit" id="login-attempt" name="login-attempt" value="login">
         </form>
-        <form  method="post">
+        <form method="post">
             <input type="submit" name="sign-up" value="signup">
         </form>
     {% else %}
@@ -106,10 +105,23 @@
     </select>
         <br><br>
         School: <select name="school" id="school" required>
-        <option value="" selected="selected" >Please select polytechnic first</option>
+        <option value="" selected="selected">Please select polytechnic first</option>
     </select>
         <br><br>
         <input type="submit" id="school-course" name="school-course">
+    </form>
+    <!-- scholarship form -->
+    <form method="post">
+        <p>Find scholarships from school</p>
+        Polytechnic: <select name="poly" id="poly2">
+        <option value="" selected="selected">Select Polytechnic</option>
+    </select>
+        <br><br>
+        School: <select name="school" id="school2" required>
+        <option value="" selected="selected">Please select polytechnic first</option>
+    </select>
+        <br><br>
+        <input type="submit" id="school-scholarship" name="school-scholarship">
     </form>
 {% endblock %}
 

@@ -16,6 +16,7 @@ passwd = 'root'
 database = '2103_db'
 app.debug = True
 
+
 # to jsonify decimals values for vote
 # https://bobbyhadz.com/blog/python-typeerror-object-of-type-decimal-is-not-json-serializable#:~:text=The%20Python%20%22TypeError%3A%20Object%20of,string%20to%20preserve%20its%20precision.
 class DecimalEncoder(json.JSONEncoder):
@@ -27,6 +28,7 @@ class DecimalEncoder(json.JSONEncoder):
         # 👇️ otherwise use the default behavior
         return json.JSONEncoder.default(self, obj)
 
+
 def connectToDB(sqlCommand):
     mydb = mysql.connector.connect(
         host=host,
@@ -36,14 +38,58 @@ def connectToDB(sqlCommand):
     )
     print("db connected")
     mycursor = mydb.cursor()
-
+    print("sql command: " + sqlCommand)
     mycursor.execute(sqlCommand)
     if ('INSERT') in sqlCommand or ('DELETE') in sqlCommand:
-        print("sql command: " + sqlCommand)
         mydb.commit()
+
     DBData = json.dumps(mycursor.fetchall(), cls=DecimalEncoder)
     mycursor.close()
     return DBData
+
+
+@app.route('/signup', methods=["GET", "POST"])
+def sign_up():  # put application's code here
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+        sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'"
+        userExists = json.loads(connectToDB(sqlQuery))
+
+        if userExists:
+            flash("existing username")
+        else:
+            insertSQL = "INSERT INTO users ( username, password) VALUES ('%s' , '%s' );" % (username, password)
+            connectToDB(insertSQL)
+            session['user'] = username
+            return redirect(url_for('index'))
+    return render_template("signup.html")
+
+
+# user can choose to login or not (must login if want to comment)
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == "POST":
+        # eligible courses form
+        if "login-attempt" in request.form:
+            username = request.form['username']
+            password = request.form['password']
+            sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'" + " AND password = " + "'" + password + "'"
+            authUser = json.loads(connectToDB(sqlQuery))
+            session.pop('user', None)
+            if authUser:
+                session['user'] = username
+                return redirect(request.referrer)
+            else:
+                flash("wrong credentials")
+                return redirect(request.referrer)
+    return 'login sucess'
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('index'))
 
 
 def validateLogin():
@@ -116,6 +162,7 @@ def index():  # put application's code here
         # specific school courses form
         if "school-course" in request.form:
 
+            school = request.form["school"]
             polyNames = request.form["poly"].split()
             poly = ""
             for i in polyNames:
@@ -126,62 +173,33 @@ def index():  # put application's code here
             elif poly == 'NAP':
                 poly = 'NP'
 
-            school = request.form["school"]
             sqlQuery = ("SELECT course_code, course_name, poly_name, lower_bound, upper_bound " \
                         "FROM course C, school S, polytechnic P " \
                         "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id AND poly_name = '%s' AND school_name = '%s'" % (
-                        poly, school))
+                            poly, school))
             print(sqlQuery)
             DBdata = connectToDB(sqlQuery)
 
             return redirect(url_for('eligible_courses', DBdata=DBdata, schoolQuery=True, login=login))
-            # return render_template("eligible.html", schoolQuery=True, eligibleCourses=DBdata)
+        if "school-scholarship" in request.form:
+            school = request.form["school"]
+            # get school id
+            schoolIDSQL = " SELECT school_id FROM school WHERE school_name ='%s'" % (school)
+            schoolID = json.loads(connectToDB(schoolIDSQL))
+            print("school id? :", schoolID)
+            scholarshipOfferedSQL = "SELECT scholarship_name " \
+                                    "FROM school SL, school_scholarship SSP, scholarship SP " \
+                                    "WHERE SL.school_id = SSP.school_id " \
+                                    "AND SP.scholarship_id = SSP.scholarship_id AND SL.school_id = %d" % (
+                                        int(schoolID[0][0]))
+
+            print("sql :", scholarshipOfferedSQL)
+            scholarshipsOffered = connectToDB(scholarshipOfferedSQL)
+
+            print("success: ", scholarshipsOffered)
+            return redirect(url_for('scholarships_offered', DBdata=scholarshipsOffered, school=school, login=login))
 
     return render_template("index.html", login=login)
-
-
-@app.route('/signup', methods=["GET", "POST"])
-def sign_up():  # put application's code here
-    if request.method == "POST":
-        username = request.form['username']
-        password = request.form['password']
-        sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'"
-        userExists = json.loads(connectToDB(sqlQuery))
-
-        if userExists:
-            flash("existing username")
-        else:
-            insertSQL = "INSERT INTO users ( username, password) VALUES ('%s' , '%s' );" % (username, password)
-            connectToDB(insertSQL)
-            session['user'] = username
-            return redirect(url_for('index'))
-    return render_template("signup.html")
-
-
-# user can choose to login or not (must login if want to comment)
-@app.route('/login', methods=['POST'])
-def login():
-    if request.method == "POST":
-        # eligible courses form
-        if "login-attempt" in request.form:
-            username = request.form['username']
-            password = request.form['password']
-            sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'" + " AND password = " + "'" + password + "'"
-            authUser = json.loads(connectToDB(sqlQuery))
-            session.pop('user', None)
-            if authUser:
-                session['user'] = username
-                return redirect(request.referrer)
-            else:
-                flash("wrong credentials")
-                return redirect(request.referrer)
-    return 'login sucess'
-
-
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    return redirect(url_for('index'))
 
 
 # redirect from first form
@@ -206,8 +224,43 @@ def eligible_courses():
 # redirect from second form
 @app.route('/scholarships')
 def scholarships_offered():
-    return 'scholarships offered'
+    # check if user logged in
+    login = validateLogin()
+    school = request.args.get('school')
 
+    criteriaList = []
+    scholarshipsOffered = json.loads(request.args.get('DBdata'))
+    print("scholarshipsOffered:  ", scholarshipsOffered)
+    for i in scholarshipsOffered:
+
+        getCriteriaSQL = "SELECT criteria_description FROM school SL, school_scholarship SSP, scholarship SP, scholarship_criteria SPC, criteria C " \
+                         "WHERE SL.school_id = SSP.school_id " \
+                         "AND SP.scholarship_id = SSP.scholarship_id " \
+                         "AND SP.scholarship_id = SPC.scholarship_id " \
+                         "AND SPC.criteria_id = C.criteria_id " \
+                         "AND scholarship_name = \"%s\" AND school_name = '%s'" % (i[0], school)
+        criteriaData = json.loads(connectToDB(getCriteriaSQL))
+        print("criteriaData:  ",criteriaData)
+        criteriaList.append(criteriaData)
+
+    print("criteriaList: ", criteriaList)
+    return render_template('scholarships.html', scholarshipsOffered=scholarshipsOffered,criteriaList=criteriaList, school=school, login=login)
+
+    # for i in scholarshipsOffered:
+    #
+    #     if i ==  scholarshipsOffered[-1]:
+    #         school = "'" + request.args.get('school')
+    #     getCriteriaSQL = "SELECT school_name, scholarship_name, criteria_description FROM school SL, school_scholarship SSP, scholarship SP, scholarship_criteria SPC, criteria C " \
+    #                      "WHERE SL.school_id = SSP.school_id " \
+    #                      "AND SP.scholarship_id = SSP.scholarship_id " \
+    #                      "AND SP.scholarship_id = SPC.scholarship_id " \
+    #                      "AND SPC.criteria_id = C.criteria_id " \
+    #                      "AND scholarship_name = '%s' AND school_name = %s" % (i[0], school)
+    #     print("getCriteriaSQL: ", getCriteriaSQL)
+    #     criteriaData = json.loads(connectToDB(getCriteriaSQL))
+    #     gatherCriteriaList = []
+    #     for j in criteriaData:
+    #         gatherCriteriaList.append(j)
 
 # try to combine /upvote and /downvote with this
 @app.route('/vote/<upOrDown>', methods=['GET', 'POST'])
@@ -233,14 +286,15 @@ def upvote():
 
             if upvotedBefore:
 
-                undoUpVote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d AND vote_value = 1 ;" % (userID, upvoted)
+                undoUpVote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d AND vote_value = 1 ;" % (
+                    userID, upvoted)
                 connectToDB(undoUpVote)
             # else upvote
             else:
                 # delete downvote if exists
                 deleteDownvote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d;" % (userID, upvoted)
                 insertUpvote = "INSERT INTO vote ( user_id, comment_id, vote_value) VALUES (%d , %d , 1);" % (
-                userID, upvoted)
+                    userID, upvoted)
                 connectToDB(deleteDownvote)
                 connectToDB(insertUpvote)
 
@@ -256,7 +310,6 @@ def upvote():
 @app.route('/downvote', methods=['GET', 'POST'])
 def downvote():
     # check if user logged in
-    print("test2")
     login = validateLogin()
     if request.method == "POST":
         downvoted = int(request.form['downvote'])
@@ -268,14 +321,15 @@ def downvote():
             downvotedBefore = json.loads(connectToDB(
                 "SELECT 1 FROM vote WHERE comment_id = %d AND user_id = %d AND vote_value = -1" % (downvoted, userID)))
             if downvotedBefore:
-                undoDownVote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d AND vote_value = -1;" % (userID, downvoted)
+                undoDownVote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d AND vote_value = -1;" % (
+                    userID, downvoted)
                 connectToDB(undoDownVote)
             # else upvote
             else:
                 # delete downvote if exists
                 deleteUpvote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d;" % (userID, downvoted)
                 insertDownvote = "INSERT INTO vote ( user_id, comment_id, vote_value) VALUES (%d , %d , -1);" % (
-                userID, downvoted)
+                    userID, downvoted)
                 connectToDB(deleteUpvote)
                 connectToDB(insertDownvote)
             flash("vote registered")
@@ -306,7 +360,7 @@ def comments():
             print(courseID[0][0])
             print(userID[0][0])
             insertSQL = "INSERT INTO comments ( description, course_id, user_id) VALUES ('%s' , %d , %d);" % (
-            comment, courseID[0][0], userID[0][0])
+                comment, courseID[0][0], userID[0][0])
             print("insertSQl: " + insertSQL)
             connectToDB(insertSQL)
 
@@ -340,13 +394,14 @@ def comments():
                                                         "GROUP BY V.comment_id " \
                                                         "ORDER BY comment_id ASC"
 
-
     commentData = json.loads(connectToDB(commentsSQLQuery))
     courseData = json.loads(connectToDB(courseSQLQuery))
     voteValues = json.loads(connectToDB(voteSQLQuery))
     print(courseData)
     # my_url = url_for('search_bp.search', book=book, author=author)
-    return render_template("comments.html", courseComments=commentData, chosenCourse=courseData, votes = voteValues, login=login)
+    return render_template("comments.html", courseComments=commentData, chosenCourse=courseData, votes=voteValues,
+                           login=login)
+
 
 if __name__ == '__main__':
     app.run()
