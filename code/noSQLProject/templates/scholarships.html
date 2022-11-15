@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block main %}
+
+    {% if not login %}
+        <form action="/login" method="post">
+            Username: <input name="username">
+            Password: <input name="password">
+            <input type="submit" id="login-attempt" name="login-attempt" value="login">
+        </form>
+    {% else %}
+        <p> Hi {{ login }}</p>
+        <a href={{ url_for('logout') }}>logout</a>
+    {% endif %}
+    <body>
+    <p>showing scholarships offered by {{ school }}</p>
+    <table>
+        <tr>
+            <td>Scholarships</td>
+            <td>Criteria</td>
+        </tr>
+
+        {% for item in range(scholarshipsOffered|length) %}
+            <tr>
+                <td>{{ scholarshipsOffered[item][0] }}</td>
+                <td>
+                    {% for x in range(criteriaList|length) %}
+                        {% if x == item %}
+                            {% for y in range(criteriaList[x]|length) %}
+                                {% for z in range(criteriaList[y]|length) %}
+                                    {{ criteriaList[x][y][z] }}
+                                {% endfor %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+
+        {% endfor %}
+
+    </table>
+
+{% endblock %}

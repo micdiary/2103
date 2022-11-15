@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block main %}
+    {% if not login %}
+        <form action="/login" method="post">
+            Username: <input name="username">
+            Password: <input name="password">
+            <input type="submit" id="login-attempt" name="login-attempt" value="login">
+        </form>
+    {% else %}
+        <p> Hi {{ login }}</p>
+        <a href={{ url_for('logout') }}>logout</a>
+    {% endif %}
+    <title>Courses Eligible</title>
+    {% if aggregate %}
+        <p>Your aggregate score: {{ school }}</p>
+    {% endif %}
+    {% if schoolQuery %}
+        <p>Showing school courses</p>
+    {% endif %}
+    {% if school %}
+        <p>Showing {{ aggregate }}</p>
+    {% endif %}
+    <table>
+        <tr>
+            <td>Course name</td>
+            <td>Course code</td>
+            <td>Lower Bound</td>
+            <td>Upper Bound</td>
+            {% if not schoolQuery %}
+                <td>School name</td>
+            {% endif %}
+            <td>Polytechnic</td>
+
+        </tr>
+
+        {% for dictItem in eligibleCourses %}
+            <tr>
+            {% for key, value in dictItem.items() %}
+                <td>{{ value }}</td>
+            {% endfor %}
+             </tr>
+        {% endfor %}
+
+
+
+
+    </table>
+
+{% endblock %}
