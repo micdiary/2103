@@ -28,6 +28,7 @@ class DecimalEncoder(json.JSONEncoder):
         # 👇️ otherwise use the default behavior
         return json.JSONEncoder.default(self, obj)
 
+
 # pull or push data from/to mySQL
 def connectToDB(sqlCommand):
     mydb = mysql.connector.connect(
@@ -100,6 +101,7 @@ def validateLogin():
         login = False
 
     return login
+
 
 # main page
 @app.route('/', methods=["GET", "POST"])
@@ -189,9 +191,7 @@ def index():  # put application's code here
                                     "AND SP.scholarship_id = SSP.scholarship_id AND SL.school_id = %d" % (
                                         int(schoolID[0][0]))
 
-
             scholarshipsOffered = connectToDB(scholarshipOfferedSQL)
-
 
             return redirect(url_for('scholarships_offered', DBdata=scholarshipsOffered, school=school, login=login))
 
@@ -229,7 +229,6 @@ def scholarships_offered():
 
     # get all scholarship criteria from database
     for i in scholarshipsOffered:
-
         getCriteriaSQL = "SELECT criteria_description FROM school SL, school_scholarship SSP, scholarship SP, scholarship_criteria SPC, criteria C " \
                          "WHERE SL.school_id = SSP.school_id " \
                          "AND SP.scholarship_id = SSP.scholarship_id " \
@@ -240,9 +239,8 @@ def scholarships_offered():
 
         criteriaList.append(criteriaData)
 
-
-    return render_template('scholarships.html', scholarshipsOffered=scholarshipsOffered,criteriaList=criteriaList, school=school, login=login)
-
+    return render_template('scholarships.html', scholarshipsOffered=scholarshipsOffered, criteriaList=criteriaList,
+                           school=school, login=login)
 
 
 # try to combine /upvote and /downvote with this
@@ -250,6 +248,7 @@ def scholarships_offered():
 def vote(upOrDown):
     print("test")
     return redirect(request.referrer)
+
 
 # upvote button submitted
 @app.route('/upvote', methods=['GET', 'POST'])
@@ -323,6 +322,7 @@ def downvote():
             return redirect(request.referrer)
 
     return redirect(request.referrer)
+
 
 # comment  form submitted
 @app.route('/eligible/comments', methods=['GET', 'POST'])

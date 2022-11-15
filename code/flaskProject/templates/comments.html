@@ -1,76 +1,76 @@
 {% extends 'base.html' %}
 {% block main %}
-<body>
-{% if not login %}
-    <form action="/login" method="post">
-        Username: <input name="username">
-        Password: <input name="password">
-        <input type="submit" id="login-attempt" name="login-attempt" value="login">
-    </form>
-{% else %}
-    <p> Hi {{ login }}</p>
-    <a href={{ url_for('logout') }}>logout</a>
-{% endif %}
-<table>
-    <tr>
-        <td>Course code</td>
-        <td>Course name</td>
-        <td>School</td>
-        <td>Polytechnic</td>
-        <td>Lower Bound</td>
-        <td>Upper Bound</td>
-    </tr>
-    <tr>
-        {% for item in chosenCourse %}
-            <td>{{ item[0] }}</td>
-            <td>{{ item[1] }}</td>
-            <td>{{ item[2] }}</td>
-            <td>{{ item[3] }}</td>
-            <td>{{ item[4] }}</td>
-            <td>{{ item[5] }}</td>
-        {% endfor %}
-    </tr>
-</table>
-<h2>Comment section</h2>
-<table>
-    {% for item in courseComments %}
+    <body>
+    {% if not login %}
+        <form action="/login" method="post">
+            Username: <input name="username">
+            Password: <input name="password">
+            <input type="submit" id="login-attempt" name="login-attempt" value="login">
+        </form>
+    {% else %}
+        <p> Hi {{ login }}</p>
+        <a href={{ url_for('logout') }}>logout</a>
+    {% endif %}
+    <table>
         <tr>
-            <td>Username:</td>
-            <td>{{ item[1] }}</td>
-
-            <td>Description:</td>
-            <td>{{ item[0] }}</td>
-            <form action="{{ url_for('upvote') }}" method="post">
-                <input type="hidden" name="upvote" value="{{ item[2] }}">
-                <td><input type="submit" value="upvote"></td>
-            </form>
-
-            <form action="{{ url_for('downvote') }}" method="post">
-                <input type="hidden" name="downvote" value="{{ item[2] }}">
-                <td><input type="submit" value="downvote"></td>
-            </form>
-
-            {% for value in votes if value[0] == item[2]%}
-
-                   <td>vote: {{ value[1] }} </td>
-           {% else %}
-            <td>vote: 0 </td>
-
-            {% endfor %}
-
+            <td>Course code</td>
+            <td>Course name</td>
+            <td>School</td>
+            <td>Polytechnic</td>
+            <td>Lower Bound</td>
+            <td>Upper Bound</td>
         </tr>
+        <tr>
+            {% for item in chosenCourse %}
+                <td>{{ item[0] }}</td>
+                <td>{{ item[1] }}</td>
+                <td>{{ item[2] }}</td>
+                <td>{{ item[3] }}</td>
+                <td>{{ item[4] }}</td>
+                <td>{{ item[5] }}</td>
+            {% endfor %}
+        </tr>
+    </table>
+    <h2>Comment section</h2>
+    <table>
+        {% for item in courseComments %}
+            <tr>
+                <td>Username:</td>
+                <td>{{ item[1] }}</td>
+
+                <td>Description:</td>
+                <td>{{ item[0] }}</td>
+                <form action="{{ url_for('upvote') }}" method="post">
+                    <input type="hidden" name="upvote" value="{{ item[2] }}">
+                    <td><input type="submit" value="upvote"></td>
+                </form>
+
+                <form action="{{ url_for('downvote') }}" method="post">
+                    <input type="hidden" name="downvote" value="{{ item[2] }}">
+                    <td><input type="submit" value="downvote"></td>
+                </form>
+
+                {% for value in votes if value[0] == item[2] %}
+
+                    <td>vote: {{ value[1] }} </td>
+                {% else %}
+                    <td>vote: 0</td>
+
+                {% endfor %}
+
+            </tr>
 
 
-    {% endfor %}
-</table>
-<p>Enter your comments: </p>
-<form method="post">
+        {% endfor %}
+    </table>
+    <p>Enter your comments: </p>
+    <form method="post">
 <textarea rows="4" cols="50" name="textbox">
 Enter text here...</textarea>
-    {% for item in chosenCourse %}
-        <input type="hidden" name="course-code" value={{ item[0] }}>
-    {% endfor %}
-    <input type="submit">
-</form>
+        {% for item in chosenCourse %}
+            <input type="hidden" name="course-code" value={{ item[0] }}>
+        {% endfor %}
+        <input type="submit">
+    </form>
 
 {% endblock %}

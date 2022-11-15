@@ -33,7 +33,7 @@
         </tr>
         {% for item in eligibleCourses %}
             <tr></tr>
-            <td><a href="{{url_for('comments', comment=item[0])}}">{{ item[0] }}</a></td>
+            <td><a href="{{ url_for('comments', comment=item[0]) }}">{{ item[0] }}</a></td>
             <td>{{ item[1] }}</td>
             {% if schoolQuery %}
                 <td>{{ item[2] }}</td>
