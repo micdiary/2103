@@ -1,23 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-<body>
+{% extends 'base.html' %}
+
+{% block main %}
+
+
 <form method="post">
             Username: <input name="username">
             Password: <input type="password" name="password">
             <input type="submit"  name="create-acc" value="create account">
         </form>
-</body>
-</html>
+
+{% endblock %}

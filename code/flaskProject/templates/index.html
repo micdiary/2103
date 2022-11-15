@@ -1,15 +1,8 @@
 ﻿<script src="{{ url_for('static', filename='js/cascading.js') }}"></script>
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class=flashes>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
-{% block title %}Home{% endblock %}
-{% block content %}
+
+{% extends 'base.html' %}
+
+{% block main %}
 
 
     {% if not login %}
