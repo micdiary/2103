@@ -149,21 +149,21 @@ def index():  # put application's code here
 
             # get sql data
             #eligibleCourses = connectToDB(sqlQuery + " ORDER BY poly_name, upper_bound ASC")
+            eligibleCourses= json_util.dumps(eligibleCourses)
 
-            eligibleCourses = json_util.dumps(eligibleCourses)
 
             return redirect(
                 url_for('eligible_courses', aggregate=aggregate, DBdata=eligibleCourses, school=school, login=login))
-            # return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school)
 
         # specific school courses form submitted
         if "school-course" in request.form:
 
             school = request.form["school"]
             polyNames = request.form["poly"].split()
+            polyList = []
             poly = ""
 
-            # string manipulation of poly name for sql query
+            # string manipulation of poly name to get poly first letters (e.g. Singapore Poly = SP)
             for i in polyNames:
                 poly += i[0]
 
@@ -172,14 +172,15 @@ def index():  # put application's code here
             elif poly == 'NAP':
                 poly = 'NP'
 
-            sqlQuery = ("SELECT course_code, course_name, poly_name, lower_bound, upper_bound " \
-                        "FROM course C, school S, polytechnic P " \
-                        "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id AND poly_name = '%s' AND school_name = '%s'" % (
-                            poly, school))
+            print('school ',school)
+            print('poly', poly)
+            schoolCourses = db.find({'school_name': school, 'polytechnic': poly}
+                                    ,{'course_code': 1, 'course_name': 1, 'polytechnic': 1,'lower_bound': 1,
+                                      'upper_bound': 1, '_id': 0})
 
-            DBdata = connectToDB(sqlQuery)
+            schoolCourses = json_util.dumps(schoolCourses)
 
-            return redirect(url_for('eligible_courses', DBdata=DBdata, schoolQuery=True, login=login))
+            return redirect(url_for('eligible_courses', DBdata=schoolCourses, schoolQuery=school, login=login))
 
         # scholarship for submitted
         if "school-scholarship" in request.form:
@@ -215,6 +216,7 @@ def eligible_courses():
     school = request.args.get('aggregate')
     aggregate = request.args.get('school')
     if schoolQuery:
+        print(eligibleCourses)
         return render_template("eligible.html", schoolQuery=schoolQuery, eligibleCourses=eligibleCourses, login=login)
     elif school:
         return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school,
