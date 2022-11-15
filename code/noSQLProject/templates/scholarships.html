@@ -20,22 +20,13 @@
             <td>Criteria</td>
         </tr>
 
-        {% for item in range(scholarshipsOffered|length) %}
+        {% for scholarships in scholarshipsOffered %}
             <tr>
-                <td>{{ scholarshipsOffered[item][0] }}</td>
-                <td>
-                    {% for x in range(criteriaList|length) %}
-                        {% if x == item %}
-                            {% for y in range(criteriaList[x]|length) %}
-                                {% for z in range(criteriaList[y]|length) %}
-                                    {{ criteriaList[x][y][z] }}
-                                {% endfor %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endfor %}
-                </td>
+            {% for key, value in scholarships.items() %}
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+            {% endfor %}
             </tr>
-
         {% endfor %}
 
     </table>

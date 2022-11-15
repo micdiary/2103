@@ -185,17 +185,11 @@ def index():  # put application's code here
         # scholarship for submitted
         if "school-scholarship" in request.form:
             school = request.form["school"]
-            # get school id
-            schoolIDSQL = " SELECT school_id FROM school WHERE school_name ='%s'" % (school)
-            schoolID = json.loads(connectToDB(schoolIDSQL))
+            # get school scholarships and its descriptions as key value pairs
+            scholarshipsOffered = db.find({'school_name': school}
+                                    , {'scholarship': 1, '_id': 0}).distinct('scholarship')
 
-            scholarshipOfferedSQL = "SELECT scholarship_name " \
-                                    "FROM school SL, school_scholarship SSP, scholarship SP " \
-                                    "WHERE SL.school_id = SSP.school_id " \
-                                    "AND SP.scholarship_id = SSP.scholarship_id AND SL.school_id = %d" % (
-                                        int(schoolID[0][0]))
-
-            scholarshipsOffered = connectToDB(scholarshipOfferedSQL)
+            scholarshipsOffered = json_util.dumps(scholarshipsOffered)
 
             return redirect(url_for('scholarships_offered', DBdata=scholarshipsOffered, school=school, login=login))
 
@@ -232,22 +226,9 @@ def scholarships_offered():
     login = validateLogin()
     school = request.args.get('school')
 
-    criteriaList = []
     scholarshipsOffered = json.loads(request.args.get('DBdata'))
 
-    # get all scholarship criteria from database
-    for i in scholarshipsOffered:
-        getCriteriaSQL = "SELECT criteria_description FROM school SL, school_scholarship SSP, scholarship SP, scholarship_criteria SPC, criteria C " \
-                         "WHERE SL.school_id = SSP.school_id " \
-                         "AND SP.scholarship_id = SSP.scholarship_id " \
-                         "AND SP.scholarship_id = SPC.scholarship_id " \
-                         "AND SPC.criteria_id = C.criteria_id " \
-                         "AND scholarship_name = \"%s\" AND school_name = '%s'" % (i[0], school)
-        criteriaData = json.loads(connectToDB(getCriteriaSQL))
-
-        criteriaList.append(criteriaData)
-
-    return render_template('scholarships.html', scholarshipsOffered=scholarshipsOffered, criteriaList=criteriaList,
+    return render_template('scholarships.html', scholarshipsOffered=scholarshipsOffered,
                            school=school, login=login)
 
 
@@ -346,6 +327,7 @@ def comments():
         # check if logged in
         if comment and login:
             # submit comment into course
+
             courseID = json.loads(connectToDB("SELECT course_id FROM course WHERE course_code = '%s'" % (courseNo)))
             userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'" % (login)))
 
@@ -359,19 +341,26 @@ def comments():
             return redirect(request.url)
 
     # retrieve comments section
-    course_code = "'" + request.args.get('comment') + "'"
+    course_code = request.args.get('comment')
 
     # get sql of course
-    courseSQLQuery = "SELECT course_code, course_name,  school_name , poly_name, lower_bound, upper_bound" \
-                     " FROM course C, school S, polytechnic P " \
-                     " WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id and course_code = " + course_code
+    courseSQLQuery = db.find({'course_code': course_code}
+                            , {'course_code': 1, 'course_name': 1, 'school_name': 1,'polytechnic': 1, 'lower_bound': 1,
+                               'upper_bound': 1, '_id': 0})
+    # courseSQLQuery = "SELECT course_code, course_name,  school_name , poly_name, lower_bound, upper_bound" \
+    #                  " FROM course C, school S, polytechnic P " \
+    #                  " WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id and course_code = " + course_code
 
     # get sql of comments
-    commentsSQLQuery = "SELECT description, username, comment_id " \
-                       "FROM comments C1, users U, course C2 " \
-                       "WHERE U.user_id = C1.user_id " \
-                       "AND C1.course_id = C2.course_id AND course_code = " + course_code + " " \
-                                                                                            "ORDER BY comment_id ASC"
+    courseSQLQuery = db.find({'course_code': course_code}
+                             ,
+                             {'course_code': 1, 'course_name': 1, 'school_name': 1, 'polytechnic': 1, 'lower_bound': 1,
+                              'upper_bound': 1, '_id': 0})
+    # commentsSQLQuery = "SELECT description, username, comment_id " \
+    #                    "FROM comments C1, users U, course C2 " \
+    #                    "WHERE U.user_id = C1.user_id " \
+    #                    "AND C1.course_id = C2.course_id AND course_code = " + course_code + " " \
+    #                                                                                         "ORDER BY comment_id ASC"
     # get vote of comments
     voteSQLQuery = "SELECT C1.comment_id, SUM(vote_value) " \
                    "FROM  vote V, comments C1, users U, course C2 " \

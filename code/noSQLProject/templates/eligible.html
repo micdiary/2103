@@ -35,13 +35,17 @@
 
         {% for dictItem in eligibleCourses %}
             <tr>
-            {% for key, value in dictItem.items() %}
-                <td>{{ value }}</td>
-            {% endfor %}
-             </tr>
+                {% for key, value in dictItem.items() %}
+                    <td>
+                        {% if key == 'course_name' %}
+                            <a href="{{ url_for('comments', comment= value ) }}">{{ value }}</a>
+                        {% else %}
+                            {{ value }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
         {% endfor %}
-
-
 
 
     </table>
