@@ -37,7 +37,7 @@
             <tr>
                 {% for key, value in dictItem.items() %}
                     <td>
-                        {% if key == 'course_name' %}
+                        {% if key == 'course_code' %}
                             <a href="{{ url_for('comments', comment= value ) }}">{{ value }}</a>
                         {% else %}
                             {{ value }}

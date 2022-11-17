@@ -6,3 +6,10 @@ Flask-PyMongo
             <td>{{# item[2] }}</td>
 
             -->
+
+
+    {% for dictItem in online_users %}
+        {% for key, value in dictItem.items() %}
+            {{ value }}
+        {% endfor %}
+    {% endfor %}

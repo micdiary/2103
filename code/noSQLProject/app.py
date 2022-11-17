@@ -45,14 +45,13 @@ def sign_up():  # put application's code here
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-        sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'"
-        userExists = json.loads(connectToDB(sqlQuery))
+        userExists = mongo.db.Account.find_one({'username': username}, {'username': 1, '_id': 0})
         # check if username exists
         if userExists:
             flash("existing username")
         else:
-            insertSQL = "INSERT INTO users ( username, password) VALUES ('%s' , '%s' );" % (username, password)
-            connectToDB(insertSQL)
+            mongo.db.Account.insert_one({'username': username, 'password': password})
+
             session['user'] = username
             return redirect(url_for('index'))
     return render_template("signup.html")
@@ -66,8 +65,8 @@ def login():
         if "login-attempt" in request.form:
             username = request.form['username']
             password = request.form['password']
-            sqlQuery = "SELECT 1 from users WHERE username = " + "'" + username + "'" + " AND password = " + "'" + password + "'"
-            authUser = json.loads(connectToDB(sqlQuery))
+            authUser = mongo.db.Account.find_one({'username': username, 'password': password},
+                                                 {'username': 1, '_id': 0})
             session.pop('user', None)
             if authUser:
                 session['user'] = username
@@ -101,6 +100,12 @@ def index():  # put application's code here
     # EXAMPLE:
     # online_users = db.find({'polytechnic': "RP"},{ 'course_name': 1, 'polytechnic': 1,  '_id': 0})
 
+    # mongo.db.Comments.insert_one({'description': 'test',
+    #                                         'course': course['_id'],
+    #                                         'commentor': commentor['_id'],
+    #                                         'vote':[
+    #                                         ]
+    #                                         })
     login = validateLogin()
     if request.method == "POST":
         if "sign-up" in request.form:
@@ -111,9 +116,10 @@ def index():  # put application's code here
             school = "all polytechnics"
             aggregate = int(request.form["grade1"]) + int(request.form["grade2"]) + int(request.form["grade3"]) + int(
                 request.form["grade4"]) + int(request.form["grade5"])
-            eligibleCourses = db.find({'upper_bound': {'$gte':aggregate}},
-                                      { 'course_code': 1,'course_name': 1,'school_name': 1, 'polytechnic': 1,
-                                        'lower_bound': 1,'upper_bound': 1, '_id': 0}).sort( [('polytechnic',1),('upper_bound',1)])
+            eligibleCourses = db.find({'upper_bound': {'$gte': aggregate}},
+                                      {'course_code': 1, 'course_name': 1, 'school_name': 1, 'polytechnic': 1,
+                                       'lower_bound': 1, 'upper_bound': 1, '_id': 0}).sort(
+                [('polytechnic', 1), ('upper_bound', 1)])
 
             # sqlQuery = "SELECT course_code, course_name, school_name, poly_name, lower_bound, upper_bound " \
             #            "FROM course C, school S, polytechnic P " \
@@ -137,20 +143,20 @@ def index():  # put application's code here
             if len(schoolFilter) > 0:
                 school = ""
                 for i in schoolFilter:
-                    if i == schoolFilter[-1]: # this part is just not adding the commas
+                    if i == schoolFilter[-1]:  # this part is just not adding the commas
                         school += i
                         break
-                    school += i+ ", "
+                    school += i + ", "
                     filterQuery.append(i)
 
-                eligibleCourses = db.find({'upper_bound': {'$gte':aggregate}, 'polytechnic': {"$in": filterQuery}},
-                                      { 'course_code': 1,'course_name': 1,'school_name': 1, 'polytechnic': 1,
-                                        'lower_bound': 1,'upper_bound': 1, '_id': 0}).sort( [('polytechnic',1),('upper_bound',1)])
+                eligibleCourses = db.find({'upper_bound': {'$gte': aggregate}, 'polytechnic': {"$in": filterQuery}},
+                                          {'course_code': 1, 'course_name': 1, 'school_name': 1, 'polytechnic': 1,
+                                           'lower_bound': 1, 'upper_bound': 1, '_id': 0}).sort(
+                    [('polytechnic', 1), ('upper_bound', 1)])
 
             # get sql data
-            #eligibleCourses = connectToDB(sqlQuery + " ORDER BY poly_name, upper_bound ASC")
-            eligibleCourses= json_util.dumps(eligibleCourses)
-
+            # eligibleCourses = connectToDB(sqlQuery + " ORDER BY poly_name, upper_bound ASC")
+            eligibleCourses = json_util.dumps(eligibleCourses)
 
             return redirect(
                 url_for('eligible_courses', aggregate=aggregate, DBdata=eligibleCourses, school=school, login=login))
@@ -172,11 +178,11 @@ def index():  # put application's code here
             elif poly == 'NAP':
                 poly = 'NP'
 
-            print('school ',school)
+            print('school ', school)
             print('poly', poly)
             schoolCourses = db.find({'school_name': school, 'polytechnic': poly}
-                                    ,{'course_code': 1, 'course_name': 1, 'polytechnic': 1,'lower_bound': 1,
-                                      'upper_bound': 1, '_id': 0})
+                                    , {'course_code': 1, 'course_name': 1, 'polytechnic': 1, 'lower_bound': 1,
+                                       'upper_bound': 1, '_id': 0})
 
             schoolCourses = json_util.dumps(schoolCourses)
 
@@ -187,13 +193,11 @@ def index():  # put application's code here
             school = request.form["school"]
             # get school scholarships and its descriptions as key value pairs
             scholarshipsOffered = db.find({'school_name': school}
-                                    , {'scholarship': 1, '_id': 0}).distinct('scholarship')
+                                          , {'scholarship': 1, '_id': 0}).distinct('scholarship')
 
             scholarshipsOffered = json_util.dumps(scholarshipsOffered)
 
             return redirect(url_for('scholarships_offered', DBdata=scholarshipsOffered, school=school, login=login))
-
-
 
     return render_template("index.html", login=login)
 
@@ -322,59 +326,68 @@ def comments():
     # insert comments into db
     if request.method == "POST":
         comment = request.form['textbox']
-        courseNo = request.form['course-code']
+        courseCode = request.form['course-code']
 
         # check if logged in
         if comment and login:
+            # find user._id
+            course = db.find_one({'course_code': courseCode}, {'_id': 1})
+            user = mongo.db.Account.find_one({'username': login}, {'_id':1})
             # submit comment into course
-
-            courseID = json.loads(connectToDB("SELECT course_id FROM course WHERE course_code = '%s'" % (courseNo)))
-            userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'" % (login)))
-
-            insertSQL = "INSERT INTO comments ( description, course_id, user_id) VALUES ('%s' , %d , %d);" % (
-                comment, courseID[0][0], userID[0][0])
-            connectToDB(insertSQL)
+            print(course)
+            mongo.db.Comments.insert_one({'description': comment,
+                                                    'course': course['_id'],
+                                                    'commentor': user['_id'],
+                                                    'vote':[
+                                                    ]
+                                                    })
 
             return redirect(request.url)
         else:
             flash('Must be logged in to comment')
             return redirect(request.url)
 
-    # retrieve comments section
+    # get course details
     course_code = request.args.get('comment')
 
-    # get sql of course
-    courseSQLQuery = db.find({'course_code': course_code}
-                            , {'course_code': 1, 'course_name': 1, 'school_name': 1,'polytechnic': 1, 'lower_bound': 1,
+    courseDetails = db.find({'course_code': course_code}
+                            , {'course_code': 1, 'course_name': 1, 'school_name': 1, 'polytechnic': 1, 'lower_bound': 1,
                                'upper_bound': 1, '_id': 0})
-    # courseSQLQuery = "SELECT course_code, course_name,  school_name , poly_name, lower_bound, upper_bound" \
-    #                  " FROM course C, school S, polytechnic P " \
-    #                  " WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id and course_code = " + course_code
 
-    # get sql of comments
-    courseSQLQuery = db.find({'course_code': course_code}
-                             ,
-                             {'course_code': 1, 'course_name': 1, 'school_name': 1, 'polytechnic': 1, 'lower_bound': 1,
-                              'upper_bound': 1, '_id': 0})
-    # commentsSQLQuery = "SELECT description, username, comment_id " \
-    #                    "FROM comments C1, users U, course C2 " \
-    #                    "WHERE U.user_id = C1.user_id " \
-    #                    "AND C1.course_id = C2.course_id AND course_code = " + course_code + " " \
-    #                                                                                         "ORDER BY comment_id ASC"
+
+
+    # retrieve comments section
+    course = db.find_one({'course_code': course_code}, {'_id': 1})
+
+    comments = mongo.db.Comments.aggregate([
+        {'$match':
+             {'course': course['_id']}
+         },
+        {'$lookup': {
+            'from': "Account",
+            'localField': "commentor",
+            'foreignField': "_id",
+            'as': "comments"}
+        },
+        {
+            "$unwind": "$comments"
+        },
+
+        {'$project': {'description': 1, 'username': '$comments.username', '_id': 0}}
+
+    ])
+
     # get vote of comments
-    voteSQLQuery = "SELECT C1.comment_id, SUM(vote_value) " \
-                   "FROM  vote V, comments C1, users U, course C2 " \
-                   "WHERE V.comment_id = C1.comment_id " \
-                   "AND U.user_id = C1.user_id " \
-                   "AND C1.course_id = C2.course_id " \
-                   "AND course_code = " + course_code + " " \
-                                                        "GROUP BY V.comment_id " \
-                                                        "ORDER BY comment_id ASC"
+    # voteSQLQuery = "SELECT C1.comment_id, SUM(vote_value) " \
+    #                "FROM  vote V, comments C1, users U, course C2 " \
+    #                "WHERE V.comment_id = C1.comment_id " \
+    #                "AND U.user_id = C1.user_id " \
+    #                "AND C1.course_id = C2.course_id " \
+    #                "AND course_code = " + course_code + " " \
+    #                                                     "GROUP BY V.comment_id " \
+    #                                                     "ORDER BY comment_id ASC"
 
-    commentData = json.loads(connectToDB(commentsSQLQuery))
-    courseData = json.loads(connectToDB(courseSQLQuery))
-    voteValues = json.loads(connectToDB(voteSQLQuery))
-    return render_template("comments.html", courseComments=commentData, chosenCourse=courseData, votes=voteValues,
+    return render_template("comments.html", courseComments=comments, courseID = course_code, chosenCourse = courseDetails,
                            login=login)
 
 
