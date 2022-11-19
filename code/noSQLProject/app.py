@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash
-import pymongo
 from flask_pymongo import PyMongo
 import os
-from bson import json_util
+from bson import json_util, ObjectId
 import json
 
 app = Flask(__name__)
@@ -214,7 +213,6 @@ def eligible_courses():
     school = request.args.get('aggregate')
     aggregate = request.args.get('school')
     if schoolQuery:
-        print(eligibleCourses)
         return render_template("eligible.html", schoolQuery=schoolQuery, eligibleCourses=eligibleCourses, login=login)
     elif school:
         return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school,
@@ -236,42 +234,98 @@ def scholarships_offered():
                            school=school, login=login)
 
 
-# try to combine /upvote and /downvote with this
-@app.route('/vote/<upOrDown>', methods=['GET', 'POST'])
-def vote(upOrDown):
-    print("test")
-    return redirect(request.referrer)
-
-
 # upvote button submitted
 @app.route('/upvote', methods=['GET', 'POST'])
 def upvote():
     # check if user logged in
     login = validateLogin()
-    print("test")
+
     if request.method == "POST":
-        upvoted = int(request.form['upvote'])
+        upvoted = request.form['upvote']
+
         # check if user has login and pressed upvote
         if upvoted and login:
-            userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'" % (login)))
-            userID = int(userID[0][0])
+            objectId = ObjectId(upvoted)
+            checkVote = mongo.db.Comments.find({ '_id': objectId,'vote.username':login})
+            voteExists = ""
+            voteValue = ""
+
             # check if user voted before
-            upvotedBefore = json.loads(connectToDB(
-                "SELECT 1 FROM vote WHERE comment_id = %d AND user_id = %d AND vote_value = 1" % (upvoted, userID)))
-            # check if user has upvoted before
-            if upvotedBefore:
-                # undo the upvote
-                undoUpVote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d AND vote_value = 1 ;" % (
-                    userID, upvoted)
-                flash("upvote removed")
-                connectToDB(undoUpVote)
+            for i in checkVote:
+                voteExists = i
+
+            # if user voted bfe then update or remove vote value
+            if voteExists:
+
+                #find vote value
+                getVoteValue = mongo.db.Comments.aggregate([
+                    {
+                        '$match': {
+                            'vote':{
+                                '$elemMatch':{
+                                    '$and':[
+                                        {'username': login},
+                                        {'vote_value':1}
+                                    ]
+                                }
+                            }, '_id': objectId
+                        }
+                    },
+                    {
+                        '$project':{
+
+                            'vote':{
+                                '$filter':{
+                                    'input': '$vote',
+                                    'as' : 'vote',
+                                    'cond':{
+                                        '$and':[
+                                            {'$eq':[ '$$vote.username', login]},
+                                            {'$eq': ['$$vote.vote_value',1]}
+                                        ]
+                                    }
+                                }
+                            }, '_id':0
+                        }
+                    }
+                ])
+                for i in getVoteValue:
+                    voteValue =  i['vote'][0]['vote_value']
+                # user upvoted bfe, so we remove
+                if voteValue == 1:
+                    mongo.db.Comments.update_one(
+                        {
+                            '_id':objectId
+                        },
+                        {
+                            '$pull': {'vote':{'username':login,'vote_value':1}}
+                         }
+
+                    )
+                    flash("upvote removed")
+                # voteValue == -1, change to 1
+                else:
+                    mongo.db.Comments.update_one(
+                        {
+                            '_id': objectId,
+                            'vote': {'username': login, 'vote_value': -1}
+                        },
+                        {
+                            '$set': {'vote.$.vote_value': 1}
+                        }
+                    )
+                    flash("upvote comment")
+
+            # push new value into comment since it user never voted bfe
             else:
-                # delete downvote if exists
-                deleteDownvote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d;" % (userID, upvoted)
-                insertUpvote = "INSERT INTO vote ( user_id, comment_id, vote_value) VALUES (%d , %d , 1);" % (
-                    userID, upvoted)
-                connectToDB(deleteDownvote)
-                connectToDB(insertUpvote)
+                mongo.db.Comments.update_one(
+                    {
+                        '_id': objectId
+                    },
+                    {
+                        '$push': {'vote': {'username': login, 'vote_value': 1}}
+                    }
+                )
                 flash("upvoted comment")
 
             return redirect(request.referrer)
@@ -287,34 +341,96 @@ def downvote():
     # check if user logged in
     login = validateLogin()
     if request.method == "POST":
-        downvoted = int(request.form['downvote'])
+        downvoted = request.form['downvote']
 
         if downvoted and login:
-            userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'" % (login)))
-            userID = int(userID[0][0])
+            objectId = ObjectId(downvoted)
+            checkVote = mongo.db.Comments.find({'_id': objectId, 'vote.username': login})
+            voteExists = ""
+            voteValue = ""
+
             # check if user voted before
-            downvotedBefore = json.loads(connectToDB(
-                "SELECT 1 FROM vote WHERE comment_id = %d AND user_id = %d AND vote_value = -1" % (downvoted, userID)))
-            if downvotedBefore:
-                # undo the upvote
-                undoDownVote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d AND vote_value = -1;" % (
-                    userID, downvoted)
-                connectToDB(undoDownVote)
-                flash("downvote removed")
+            for i in checkVote:
+                voteExists = i
+
+            # if user voted bfe then update or remove vote value
+            if voteExists:
+
+                # find vote value
+                getVoteValue = mongo.db.Comments.aggregate([
+                    {
+                        '$match': {
+                            'vote': {
+                                '$elemMatch': {
+                                    '$and': [
+                                        {'username': login},
+                                        {'vote_value': -1}
+                                    ]
+                                }
+                            }, '_id': objectId
+                        }
+                    },
+                    {
+                        '$project': {
+
+                            'vote': {
+                                '$filter': {
+                                    'input': '$vote',
+                                    'as': 'vote',
+                                    'cond': {
+                                        '$and': [
+                                            {'$eq': ['$$vote.username', login]},
+                                            {'$eq': ['$$vote.vote_value', -1]}
+                                        ]
+                                    }
+                                }
+                            }, '_id': 0
+                        }
+                    }
+                ])
+                for i in getVoteValue:
+                    voteValue = i['vote'][0]['vote_value']
+                # user downvoted bfe, so we remove
+                if voteValue == -1:
+                    mongo.db.Comments.update_one(
+                        {
+                            '_id': objectId
+                        },
+                        {
+                            '$pull': {'vote': {'username': login, 'vote_value': -1}}
+                        }
+
+                    )
+                    flash("downvote removed")
+                # voteValue == 1, change to -1
+                else:
+                    mongo.db.Comments.update_one(
+                        {
+                            '_id': objectId,
+                            'vote': {'username': login, 'vote_value': 1}
+                        },
+                        {
+                            '$set': {'vote.$.vote_value': -1}
+                        }
+                    )
+                    flash("downvote comment")
+
+            # push new value into comment since it user never voted bfe
             else:
-                # delete downvote if exists
-                deleteUpvote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d;" % (userID, downvoted)
-                insertDownvote = "INSERT INTO vote ( user_id, comment_id, vote_value) VALUES (%d , %d , -1);" % (
-                    userID, downvoted)
-                connectToDB(deleteUpvote)
-                connectToDB(insertDownvote)
+                mongo.db.Comments.update_one(
+                    {
+                        '_id': objectId
+                    },
+                    {
+                        '$push': {'vote': {'username': login, 'vote_value': -1}}
+                    }
+                )
                 flash("downvoted comment")
+
             return redirect(request.referrer)
         else:
             flash('Must be logged in to downvote')
             return redirect(request.referrer)
-
-    return redirect(request.referrer)
 
 
 # comment  form submitted
@@ -373,7 +489,7 @@ def comments():
             "$unwind": "$comments"
         },
 
-        {'$project': {'description': 1, 'username': '$comments.username', '_id': 0}}
+        {'$project': {'description': 1, 'username': '$comments.username', '_id': 1,'votesum':{'$sum': '$vote.vote_value'}}}
 
     ])
 

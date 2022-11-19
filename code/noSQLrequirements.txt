@@ -1,5 +1,5 @@
 Flask-PyMongo
-
+mongoose
           <!--
 
             <td><a href="{{# url_for('comments', comment=item[0]) }}">{{# item[0] }}</a></td>
@@ -13,3 +13,72 @@ Flask-PyMongo
             {{ value }}
         {% endfor %}
     {% endfor %}
+
+
+    <table>
+
+        {% for dictItem in courseComments %}
+
+                {% for key, value in dictItem.items() %}
+
+                    {% if key == 'description' %}
+                        <td>Description:</td>
+                        <td>{{ value }}</td>
+
+                    {% elif key == 'username' %}
+                        <td>Username:</td>
+                        <td>{{ value }}</td>
+
+                    {% elif key == '_id' %}
+                        <form action="{{ url_for('upvote') }}" method="post">
+                            <input type="hidden" name="upvote" value="{{ value }}">
+                            <td><input type="submit" value="upvote"></td>
+                        </form>
+
+                        <form action="{{ url_for('downvote') }}" method="post">
+                            <input type="hidden" name="downvote" value="{{ value }}">
+                            <td><input type="submit" value="downvote"></td>
+                        </form>
+                    {% endif %}
+
+
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+
+
+{% for descriptions in courseComments %}
+            <p>{{ descriptions }}</p>
+            <tr>
+
+                {% for key2, value2 in descriptions.items() %}
+
+                    {% if key == 'description' %}
+                        <td>Description:</td>
+                        <td>{{ value2 }}</td>
+
+                    {% elif key == 'username' %}
+                        <td>Username:</td>
+                        <td>{{ value2 }}</td>
+
+                    {% elif key == '_id' %}
+                        <form action="{{ url_for('upvote') }}" method="post">
+                            <input type="hidden" name="upvote" value="{{ value2 }}">
+                            <td><input type="submit" value="upvote"></td>
+                        </form>
+
+                        <form action="{{ url_for('downvote') }}" method="post">
+                            <input type="hidden" name="downvote" value="{{ value2 }}">
+                            <td><input type="submit" value="downvote"></td>
+                        </form>
+                    {% endif %}
+
+
+                {% endfor %}
+            </tr>
+        {% endfor %}
+
+
+, courseID = course_code, chosenCourse = courseDetails

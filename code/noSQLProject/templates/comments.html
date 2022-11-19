@@ -38,10 +38,25 @@
                 {% for key, value in dictItem.items() %}
                     {% if key == 'description' %}
                         <td>Description:</td>
-                    {% else %}
+                        <td>{{ value }}</td>
+                    {% elif key == 'username' %}
                         <td>Username:</td>
+                        <td>{{ value }}</td>
+                    {% elif key == '_id' %}
+                        <form action="{{ url_for('upvote') }}" method="post">
+                            <input type="hidden" name="upvote" value="{{ value }}">
+                            <td><input type="submit" value="upvote"></td>
+                        </form>
+
+                        <form action="{{ url_for('downvote') }}" method="post">
+                            <input type="hidden" name="downvote" value="{{ value }}">
+                            <td><input type="submit" value="downvote"></td>
+                        </form>
+                    {% elif key == 'votesum' %}
+                        <td> Vote value: </td>
+                        <td>{{ value }}</td>
                     {% endif %}
-                    <td>{{ value }}</td>
+
 
                 {% endfor %}
             </tr>
