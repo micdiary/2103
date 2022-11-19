@@ -1,0 +1,11 @@
+body{
+    padding: 50px;
+}
+
+#commentUser{
+    font-weight: bold;
+}
+
+#comment{
+    padding-left: 50px;
+}
