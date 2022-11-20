@@ -3,14 +3,25 @@ body
     padding: 50px;
 }
 
-#commentUser
+.comment-section
+{
+    font-size: large;
+    padding-left: 100px;
+}
+
+.commentUser
 {
     font-weight: bold;
 }
 
-#comment
+.comment
 {
-    padding-left: 50px;
+    padding-left: 20px;
+}
+
+.vote-text
+{
+    color:rgb(110, 110, 110);
 }
 
 *{
