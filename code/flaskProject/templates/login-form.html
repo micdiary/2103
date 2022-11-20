@@ -22,17 +22,17 @@
    </nav>
 
     <div class="login-signup-box">
-        <h1>Sign Up</h1>
+        <h1>Login</h1>
 
-        <form method="post">
+        <form action="/login" method="post">
             <p>Username:</p>
             <input type="text" name="username" placeholder="Enter username...">
             <p>Password:</p>
             <input type="password" name="password" placeholder="Enter password...">
-            <button type="submit" name="create-acc" value="create account" class="btn2 btn-sm">Sign Up</button>
+            <button type="submit" id="login-attempt" name="login-attempt" value="login" class="btn2 btn-sm">Login</button>     
         </form>
 
-        <a href="/login-form">Already have an Account? Login here!</a>
+        <a href="/signup">Don't have an Account? Sign Up Now!</a>
     </div>
 </body>
 

@@ -1,25 +1,38 @@
 {% extends 'base.html' %}
 
 {% block main %}
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+    
+            {% if not login %}
+       
+            <li><a href="/login-form">Login</a></li>
+    
+            <li><a href="/signup">Sign Up</a></li>
+    
+            {% else %}
+            <li><a href={{ url_for('logout') }}>Logout</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 
     {% if not login %}
-        <form action="/login" method="post">
-            Username: <input name="username">
-            Password: <input name="password">
-            <input type="submit" id="login-attempt" name="login-attempt" value="login">
-        </form>
     {% else %}
         <p> Hi {{ login }}</p>
-        <a href={{ url_for('logout') }}>logout</a>
     {% endif %}
-    <body>
+
+    <div class="section">
     <p>showing scholarships offered by {{ school }}</p>
-    <table>
+    <table class="course-table table table-light-grey table-border">
+    <thead>
         <tr>
             <td>Scholarships</td>
             <td>Criteria</td>
         </tr>
-
+    </thead>
+    <tbody>
         {% for item in range(scholarshipsOffered|length) %}
             <tr>
                 <td>{{ scholarshipsOffered[item][0] }}</td>
@@ -37,7 +50,8 @@
             </tr>
 
         {% endfor %}
-
+    </tbody>
     </table>
-
+    </div>
+</body>
 {% endblock %}

@@ -1,16 +1,29 @@
 {% extends 'base.html' %}
 {% block main %}
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+
+             {% if not login %}
+   
+            <li><a href="/login-form">Login</a></li>
+
+            <li><a href="/signup">Sign Up</a></li>
+
+            {% else %}
+            <li><a href={{ url_for('logout') }}>Logout</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
     {% if not login %}
-        <form action="/login" method="post">
-            Username: <input name="username">
-            Password: <input name="password">
-            <input type="submit" id="login-attempt" name="login-attempt" value="login">
-        </form>
     {% else %}
-        <p> Hi {{ login }}</p>
-        <a href={{ url_for('logout') }}>logout</a>
+        <p> Welcome back {{ login }}</p>
     {% endif %}
-    <title>Courses Eligible</title>
+
+    <div class="section">
+    <p>Courses Eligible</p>
     {% if aggregate %}
         <p>Your aggregate score: {{ aggregate }}</p>
     {% endif %}
@@ -20,7 +33,10 @@
     {% if school %}
         <p>Showing {{ school }}</p>
     {% endif %}
-    <table>
+
+
+    <table class="course-table table table-light-grey table-border">
+    <thead>
         <tr>
             <td>Course code</td>
             <td>Course name</td>
@@ -31,6 +47,8 @@
             <td>Lower Bound</td>
             <td>Upper Bound</td>
         </tr>
+    </thead>
+    <tbody>
         {% for item in eligibleCourses %}
             <tr></tr>
             <td><a href="{{ url_for('comments', comment=item[0]) }}">{{ item[0] }}</a></td>
@@ -43,6 +61,9 @@
             <td>{{ item[5] }}</td>
             </tr>
         {% endfor %}
+    </tbody>
     </table>
+    </div>
+</body>
 
 {% endblock %}

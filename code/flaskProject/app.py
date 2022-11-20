@@ -80,12 +80,16 @@ def login():
             session.pop('user', None)
             if authUser:
                 session['user'] = username
-                return redirect(request.referrer)
+                return redirect(url_for('index'))
             else:
                 flash("wrong credentials")
                 return redirect(request.referrer)
     return 'login success'
 
+@app.route('/login-form')
+def loginForm():
+    session.pop('user', None)
+    return render_template("login-form.html")
 
 @app.route('/logout')
 def logout():

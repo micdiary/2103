@@ -5,7 +5,12 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css')}}">
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Dosis&display=swap">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
+
+
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         <ul class=flashes>
