@@ -377,10 +377,28 @@ def comments():
                    "AND course_code = " + course_code + " " \
                                                         "GROUP BY V.comment_id " \
                                                         "ORDER BY comment_id ASC"
-
     commentData = json.loads(connectToDB(commentsSQLQuery))
     courseData = json.loads(connectToDB(courseSQLQuery))
     voteValues = json.loads(connectToDB(voteSQLQuery))
+
+    # only highlight upvotes if user logged in
+    if login:
+        getCourseID = json.loads(connectToDB("SELECT course_id FROM course WHERE course_code = %s"%(course_code)))
+
+        getUserID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'" % (login)))
+
+        gethighLightVote = "SELECT description, V.vote_value " \
+                        "FROM vote V, comments C1, users U, course C2 " \
+                        "WHERE V.comment_id = C1.comment_id " \
+                        "AND C1.course_id = %d AND V.user_id = %d " \
+                                                 "GROUP BY V.comment_id"%(getCourseID[0][0],getUserID[0][0])
+
+        highLightVote = json.loads(connectToDB(gethighLightVote))
+
+        print(highLightVote)
+        return render_template("comments.html", courseComments=commentData, chosenCourse=courseData, votes=voteValues,
+                               hightLightVote = highLightVote, login=login)
+
     return render_template("comments.html", courseComments=commentData, chosenCourse=courseData, votes=voteValues,
                            login=login)
 
