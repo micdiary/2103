@@ -24,6 +24,41 @@ body
     color:rgb(110, 110, 110);
 }
 
+.upvote
+{
+    width: fit-content;
+    background-color: white;
+    border: 2px solid green;
+    border-color: green !important;
+    color: black;
+    cursor: pointer;
+}
+
+.upvote:hover
+{
+    cursor: pointer;
+    background: lightgreen;
+    border: 2px solid lightgreen;
+}
+
+.downvote
+{
+    width: fit-content;
+    background-color: white;
+    border: 2px solid red;
+    border-color: red !important;
+    color: black;
+    cursor: pointer;
+}
+
+.downvote:hover
+{
+    cursor: pointer;
+    background: lightcoral;
+    border: 2px solid lightcoral;
+    ;
+}
+
 *{
     margin: 0;
     padding: 0;

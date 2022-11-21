@@ -91,14 +91,14 @@
                                         <form action="{{ url_for('upvote') }}" method="post">
                                             <input type="hidden" name="upvote" value="{{ item[2] }}">
                                             <button class="btn btn-success" type="submit" value="upvote">
-                                                highlightedUpvote
+                                                Upvote
                                             </button>
                                         </form>
                                     </div>
                                     <div class="col">
                                         <form action="{{ url_for('downvote') }}" method="post">
                                             <input type="hidden" name="downvote" value="{{ item[2] }}">
-                                            <button class="btn btn-danger" type="submit" value="downvote">Downvote
+                                            <button class="btn downvote" type="submit" value="downvote">Downvote
                                             </button>
                                         </form>
                                     </div>
@@ -106,14 +106,14 @@
                                     <div class="col">
                                         <form action="{{ url_for('upvote') }}" method="post">
                                             <input type="hidden" name="upvote" value="{{ item[2] }}">
-                                            <button class="btn btn-success" type="submit" value="upvote">Upvote</button>
+                                            <button class="btn upvote" type="submit" value="upvote">Upvote</button>
                                         </form>
                                     </div>
                                     <div class="col">
                                         <form action="{{ url_for('downvote') }}" method="post">
                                             <input type="hidden" name="downvote" value="{{ item[2] }}">
                                             <button class="btn btn-danger" type="submit" value="downvote">
-                                                highlightedDownvote
+                                                Downvote
                                             </button>
                                         </form>
                                     </div>
@@ -122,14 +122,14 @@
                                 <div class="col">
                                     <form action="{{ url_for('upvote') }}" method="post">
                                         <input type="hidden" name="upvote" value="{{ item[2] }}">
-                                        <button class="btn btn-success" type="submit" value="upvote">Upvote</button>
+                                        <button class="btn upvote" type="submit" value="upvote">Upvote</button>
                                     </form>
                                 </div>
 
                                 <div class="col">
                                     <form action="{{ url_for('downvote') }}" method="post">
                                         <input type="hidden" name="downvote" value="{{ item[2] }}">
-                                        <button class="btn btn-danger" type="submit" value="downvote">Downvote</button>
+                                        <button class="btn downvote" type="submit" value="downvote">Downvote</button>
                                     </form>
                                 </div>
                             {% endfor %}
