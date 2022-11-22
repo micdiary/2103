@@ -492,16 +492,29 @@ def comments():
         {'$project': {'description': 1, 'username': '$comments.username', '_id': 1,'votesum':{'$sum': '$vote.vote_value'}}}
 
     ])
+    # highlight button if voted
+    if login:
+        highlightVote = mongo.db.Comments.find({'course': course['_id']},{'vote':1,'_id':0})
+        value = []
+        # if user voted then append vote value in value[]
+        for i in highlightVote:
+            # if empty means no votes, skip loop
+            if i['vote'] == []:
+                value.append(0)
+                continue
+            else:
+                # check if user voted in comment, add vote value in [] if exists
+                for x in i['vote']:
 
-    # get vote of comments
-    # voteSQLQuery = "SELECT C1.comment_id, SUM(vote_value) " \
-    #                "FROM  vote V, comments C1, users U, course C2 " \
-    #                "WHERE V.comment_id = C1.comment_id " \
-    #                "AND U.user_id = C1.user_id " \
-    #                "AND C1.course_id = C2.course_id " \
-    #                "AND course_code = " + course_code + " " \
-    #                                                     "GROUP BY V.comment_id " \
-    #                                                     "ORDER BY comment_id ASC"
+                    if login in x['username']:
+                        tmp=x['vote_value']
+                        break
+                    else:
+                        tmp= 0
+                value.append(tmp)
+        return render_template("comments.html", courseComments=comments, courseID=course_code,
+                               chosenCourse=courseDetails, highlightVote = value,
+                               login=login)
 
     return render_template("comments.html", courseComments=comments, courseID = course_code, chosenCourse = courseDetails,
                            login=login)

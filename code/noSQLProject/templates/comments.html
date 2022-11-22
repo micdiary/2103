@@ -33,9 +33,13 @@
     </table>
     <h2>Comment section</h2>
     <table>
+        {% set count =  [] %}
         {% for dictItem in courseComments %}
             <tr>
+
+                {% set idx = count|length  %}
                 {% for key, value in dictItem.items() %}
+
                     {% if key == 'description' %}
                         <td>Description:</td>
                         <td>{{ value }}</td>
@@ -43,22 +47,57 @@
                         <td>Username:</td>
                         <td>{{ value }}</td>
                     {% elif key == '_id' %}
-                        <form action="{{ url_for('upvote') }}" method="post">
-                            <input type="hidden" name="upvote" value="{{ value }}">
-                            <td><input type="submit" value="upvote"></td>
-                        </form>
+                        {% if highlightVote %}
+                            {% if highlightVote[idx] == 1 %}
 
-                        <form action="{{ url_for('downvote') }}" method="post">
-                            <input type="hidden" name="downvote" value="{{ value }}">
-                            <td><input type="submit" value="downvote"></td>
-                        </form>
+                                <form action="{{ url_for('upvote') }}" method="post">
+                                    <input type="hidden" name="upvote" value="{{ value }}">
+                                    <td><input type="submit" value="hightlightupvote"></td>
+                                </form>
+                                <form action="{{ url_for('downvote') }}" method="post">
+                                    <input type="hidden" name="downvote" value="{{ value }}">
+                                    <td><input type="submit" value="downvote"></td>
+                                </form>
+                            {% elif highlightVote[idx] == -1 %}
+                                <form action="{{ url_for('upvote') }}" method="post">
+                                    <input type="hidden" name="upvote" value="{{ value }}">
+                                    <td><input type="submit" value="upvote"></td>
+                                </form>
+
+                                <form action="{{ url_for('downvote') }}" method="post">
+                                    <input type="hidden" name="downvote" value="{{ value }}">
+                                    <td><input type="submit" value="highlightdownvote"></td>
+                                </form>
+                            {% else %}
+                                <form action="{{ url_for('upvote') }}" method="post">
+                                    <input type="hidden" name="upvote" value="{{ value }}">
+                                    <td><input type="submit" value="upvote"></td>
+                                </form>
+
+                                <form action="{{ url_for('downvote') }}" method="post">
+                                    <input type="hidden" name="downvote" value="{{ value }}">
+                                    <td><input type="submit" value="downvote"></td>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <form action="{{ url_for('upvote') }}" method="post">
+                                <input type="hidden" name="upvote" value="{{ value }}">
+                                <td><input type="submit" value="upvote"></td>
+                            </form>
+
+                            <form action="{{ url_for('downvote') }}" method="post">
+                                <input type="hidden" name="downvote" value="{{ value }}">
+                                <td><input type="submit" value="downvote"></td>
+                            </form>
+                        {% endif %}
                     {% elif key == 'votesum' %}
-                        <td> Vote value: </td>
+                        <td> Vote value:</td>
                         <td>{{ value }}</td>
                     {% endif %}
 
 
                 {% endfor %}
+            {% set add = count.append(1) %}
             </tr>
         {% endfor %}
     </table>
