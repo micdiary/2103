@@ -5,7 +5,7 @@ from bson import json_util, ObjectId
 import json
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/2104_Assignment"
+app.config["MONGO_URI"] = "mongodb://localhost:27017/2103_Assignment"
 app.secret_key = os.urandom(24)
 mongo = PyMongo(app)
 db = mongo.db.School
@@ -17,26 +17,6 @@ user = 'root'
 passwd = 'root'
 database = '2103_db'
 app.debug = True
-
-
-# pull or push data from/to mySQL
-def connectToDB(sqlCommand):
-    mydb = mysql.connector.connect(
-        host=host,
-        user=user,
-        passwd=passwd,
-        database=database
-    )
-    print("db connected")
-    mycursor = mydb.cursor()
-    print("sql command: " + sqlCommand)
-    mycursor.execute(sqlCommand)
-    if ('INSERT') in sqlCommand or ('DELETE') in sqlCommand:
-        mydb.commit()
-
-    DBData = json.dumps(mycursor.fetchall())
-    mycursor.close()
-    return DBData
 
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -95,16 +75,7 @@ def validateLogin():
 # main page
 @app.route('/', methods=["GET", "POST"])
 def index():  # put application's code here
-    # variableName = db.find({WHERE},{COLUMNS})
-    # EXAMPLE:
-    # online_users = db.find({'polytechnic': "RP"},{ 'course_name': 1, 'polytechnic': 1,  '_id': 0})
 
-    # mongo.db.Comments.insert_one({'description': 'test',
-    #                                         'course': course['_id'],
-    #                                         'commentor': commentor['_id'],
-    #                                         'vote':[
-    #                                         ]
-    #                                         })
     login = validateLogin()
     if request.method == "POST":
         if "sign-up" in request.form:
@@ -120,10 +91,7 @@ def index():  # put application's code here
                                        'lower_bound': 1, 'upper_bound': 1, '_id': 0}).sort(
                 [('polytechnic', 1), ('upper_bound', 1)])
 
-            # sqlQuery = "SELECT course_code, course_name, school_name, poly_name, lower_bound, upper_bound " \
-            #            "FROM course C, school S, polytechnic P " \
-            #            "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id" + " AND upper_bound >= " + str(
-            #    aggregate)
+
             # get filter conditions
             schoolFilter = []
             if request.form.get('NYP') == 'NYP':
@@ -469,7 +437,6 @@ def comments():
     courseDetails = db.find({'course_code': course_code}
                             , {'course_code': 1, 'course_name': 1, 'school_name': 1, 'polytechnic': 1, 'lower_bound': 1,
                                'upper_bound': 1, '_id': 0})
-
 
 
     # retrieve comments section

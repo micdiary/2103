@@ -6,7 +6,7 @@ import pandas as pd
 def read_csv_file(fileName):
     data = []
 
-    df = pd.read_csv(f'2103\\Data\\2103_{fileName}_Data.csv')
+    df = pd.read_csv(f'..\\Data\\2103_{fileName}_Data.csv')
 
     for _, row in df.iterrows():
         obj = {}

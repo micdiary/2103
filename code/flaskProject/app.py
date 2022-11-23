@@ -41,7 +41,7 @@ def connectToDB(sqlCommand):
     mycursor = mydb.cursor()
     print("sql command: " + sqlCommand)
     mycursor.execute(sqlCommand)
-    if ('INSERT') in sqlCommand or ('DELETE') in sqlCommand:
+    if ('INSERT') in sqlCommand or ('DELETE') in sqlCommand or ('UPDATE') in sqlCommand:
         mydb.commit()
 
     DBData = json.dumps(mycursor.fetchall(), cls=DecimalEncoder)
@@ -122,8 +122,7 @@ def index():  # put application's code here
                 request.form["grade4"]) + int(request.form["grade5"])
             sqlQuery = "SELECT course_code, course_name, school_name, poly_name, lower_bound, upper_bound " \
                        "FROM course C, school S, polytechnic P " \
-                       "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id" + " AND upper_bound >= " + str(
-                aggregate)
+                       "WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id" + " AND upper_bound >= " + str(aggregate)
             # get filter conditions
             schoolFilter = []
             if request.form.get('NYP') == 'NYP':
@@ -247,12 +246,6 @@ def scholarships_offered():
                            school=school, login=login)
 
 
-# try to combine /upvote and /downvote with this
-@app.route('/vote/<upOrDown>', methods=['GET', 'POST'])
-def vote(upOrDown):
-    print("test")
-    return redirect(request.referrer)
-
 
 # upvote button submitted
 @app.route('/upvote', methods=['GET', 'POST'])
@@ -277,12 +270,11 @@ def upvote():
                 flash("upvote removed")
                 connectToDB(undoUpVote)
             else:
-                # delete downvote if exists
-                deleteDownvote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d;" % (userID, upvoted)
-                insertUpvote = "INSERT INTO vote ( user_id, comment_id, vote_value) VALUES (%d , %d , 1);" % (
-                    userID, upvoted)
-                connectToDB(deleteDownvote)
-                connectToDB(insertUpvote)
+                # update if vote exists
+                updateUpvote = "UPDATE vote SET vote_value = 1 WHERE user_id = %d AND comment_id = %d;" % (userID, upvoted)
+
+
+                connectToDB(updateUpvote)
                 flash("upvoted comment")
 
             return redirect(request.referrer)
@@ -313,12 +305,11 @@ def downvote():
                 connectToDB(undoDownVote)
                 flash("downvote removed")
             else:
-                # delete downvote if exists
-                deleteUpvote = "DELETE FROM vote WHERE user_id = %d AND comment_id = %d;" % (userID, downvoted)
-                insertDownvote = "INSERT INTO vote ( user_id, comment_id, vote_value) VALUES (%d , %d , -1);" % (
-                    userID, downvoted)
-                connectToDB(deleteUpvote)
-                connectToDB(insertDownvote)
+                # update downvote if exists
+                updateUpvote = "UPDATE vote SET vote_value = -1 WHERE user_id = %d AND comment_id = %d;" % (
+                userID, downvoted)
+
+                connectToDB(updateUpvote)
                 flash("downvoted comment")
             return redirect(request.referrer)
         else:
@@ -345,8 +336,7 @@ def comments():
             courseID = json.loads(connectToDB("SELECT course_id FROM course WHERE course_code = '%s'" % (courseNo)))
             userID = json.loads(connectToDB("SELECT user_id FROM users WHERE username = '%s'" % (login)))
 
-            insertSQL = "INSERT INTO comments ( description, course_id, user_id) VALUES ('%s' , %d , %d);" % (
-                comment, courseID[0][0], userID[0][0])
+            insertSQL = "INSERT INTO comments ( description, course_id, user_id) VALUES ('%s' , %d , %d);" % (comment, courseID[0][0], userID[0][0])
             connectToDB(insertSQL)
 
             return redirect(request.url)
