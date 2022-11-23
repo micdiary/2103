@@ -46,7 +46,7 @@ def get_and_create_database():
     if "mydatabase" in dblist:
         print("The database exists.")
     else:
-        mydb = client['2104_Assignment']
+        mydb = client['2103_Assignment']
     
     return mydb
 
