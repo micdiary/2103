@@ -201,6 +201,17 @@ def scholarships_offered():
     return render_template('scholarships.html', scholarshipsOffered=scholarshipsOffered,
                            school=school, login=login)
 
+@app.route('/deleteComment', methods=['GET', 'POST'])
+def delete_comment():
+    # get comment Id
+    commentID = ObjectId(request.form['delComment'])
+    # delete comment
+    mongo.db.Comments.delete_one({'_id': commentID})
+    flash("comment deleted")
+
+
+    return redirect(request.referrer)
+
 
 # upvote button submitted
 @app.route('/upvote', methods=['GET', 'POST'])
@@ -441,7 +452,7 @@ def comments():
 
     # retrieve comments section
     course = db.find_one({'course_code': course_code}, {'_id': 1})
-
+    # getting the comments, the comment owner and the comment sum value
     comments = mongo.db.Comments.aggregate([
         {'$match':
              {'course': course['_id']}
@@ -461,6 +472,7 @@ def comments():
     ])
     # highlight button if voted
     if login:
+        # getting all comments in the course and their voters
         highlightVote = mongo.db.Comments.find({'course': course['_id']},{'vote':1,'_id':0})
         value = []
         # if user voted then append vote value in value[]
@@ -479,6 +491,7 @@ def comments():
                     else:
                         tmp= 0
                 value.append(tmp)
+
         return render_template("comments.html", courseComments=comments, courseID=course_code,
                                chosenCourse=courseDetails, highlightVote = value,
                                login=login)

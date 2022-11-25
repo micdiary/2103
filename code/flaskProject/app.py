@@ -219,6 +219,17 @@ def eligible_courses():
 
     return render_template("eligible.html")
 
+@app.route('/deleteComment', methods=['GET', 'POST'])
+def delete_comment():
+    # get comment Id
+    commentID = int(request.form['delComment'])
+    # delete comment
+    deleteCommentSQL = "DELETE FROM comments WHERE comment_id = %d" % (commentID)
+    connectToDB(deleteCommentSQL)
+    flash("comment deleted")
+
+
+    return redirect(request.referrer)
 
 # redirect from school-scholarship form
 @app.route('/scholarships')
@@ -385,7 +396,7 @@ def comments():
 
         highLightVote = json.loads(connectToDB(gethighLightVote))
 
-        print(highLightVote)
+
         return render_template("comments.html", courseComments=commentData, chosenCourse=courseData, votes=voteValues,
                                hightLightVote = highLightVote, login=login)
 

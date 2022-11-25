@@ -36,8 +36,8 @@
         {% set count =  [] %}
         {% for dictItem in courseComments %}
             <tr>
+                {% set idx = count|length %}
 
-                {% set idx = count|length  %}
                 {% for key, value in dictItem.items() %}
 
                     {% if key == 'description' %}
@@ -46,7 +46,11 @@
                     {% elif key == 'username' %}
                         <td>Username:</td>
                         <td>{{ value }}</td>
+                        {% if login == value %}
+                            {% set saveCommentID = dictItem['_id']  %}
+                        {% endif %}
                     {% elif key == '_id' %}
+
                         {% if highlightVote %}
                             {% if highlightVote[idx] == 1 %}
 
@@ -95,9 +99,15 @@
                         <td>{{ value }}</td>
                     {% endif %}
 
+                    {% if key == 'username' and login == value %}
+                        <form action="{{ url_for('delete_comment') }}" method="post">
+                        <input type="hidden" name="delComment" value={{ saveCommentID }}>
+                        <td><input type="submit" value="Delete Comment"></td>
+                        </form>
+                    {% endif %}
 
                 {% endfor %}
-            {% set add = count.append(1) %}
+                {% set add = count.append(1) %}
             </tr>
         {% endfor %}
     </table>

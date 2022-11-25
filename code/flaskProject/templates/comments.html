@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block main %}
-<body>
+    <body>
     <nav class="navbar sticky-top navbar-light bg-light">
         <ul>
             <li><a href="/">Home</a></li>
@@ -132,6 +132,12 @@
                                         <button class="btn downvote" type="submit" value="downvote">Downvote</button>
                                     </form>
                                 </div>
+                                {% if item[1] == login %}
+                                    <form action="{{ url_for('delete_comment') }}" method="post">
+                                        <input type="hidden" name="delComment" value={{ item[2] }}>
+                                        <td><input type="submit" value="Delete Comment"></td>
+                                    </form>
+                                {% endif %}
                             {% endfor %}
                         </div>
                     </div>
@@ -140,5 +146,5 @@
             {% endfor %}
         </div>
     </div>
-</body>
+    </body>
 {% endblock %}
