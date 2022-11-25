@@ -151,10 +151,10 @@ def index():  # put application's code here
 
             # get sql data
             eligibleCourses = connectToDB(sqlQuery + " ORDER BY poly_name, upper_bound ASC")
-
+            print(eligibleCourses)
             return redirect(
                 url_for('eligible_courses', aggregate=aggregate, DBdata=eligibleCourses, school=school, login=login))
-            # return render_template("eligible.html", aggregate=aggregate, eligibleCourses=eligibleCourses, school=school)
+
 
         # specific school courses form submitted
         if "school-course" in request.form:
@@ -359,7 +359,7 @@ def comments():
     course_code = "'" + request.args.get('comment') + "'"
 
     # get sql of course
-    courseSQLQuery = "SELECT course_code, course_name,  school_name , poly_name, lower_bound, upper_bound" \
+    courseSQLQuery = "SELECT course_code, course_name,  school_name , poly_name, lower_bound, upper_bound, citizen_fee, pr_fee, foreigner_fee " \
                      " FROM course C, school S, polytechnic P " \
                      " WHERE S.poly_id = P.poly_id AND S.school_id = C.school_id and course_code = " + course_code
 

@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 {% block main %}
-<body>
+    <body>
     <nav class="navbar sticky-top navbar-light bg-light">
         <ul>
             <li><a href="/">Home</a></li>
 
-             {% if not login %}
-   
-            <li><a href="/login-form">Login</a></li>
+            {% if not login %}
 
-            <li><a href="/signup">Sign Up</a></li>
+                <li><a href="/login-form">Login</a></li>
+
+                <li><a href="/signup">Sign Up</a></li>
 
             {% else %}
-            <li><a href={{ url_for('logout') }}>Logout</a></li>
+                <li><a href={{ url_for('logout') }}>Logout</a></li>
             {% endif %}
         </ul>
     </nav>
@@ -23,47 +23,55 @@
     {% endif %}
 
     <div class="section">
-    <p>Courses Eligible</p>
-    {% if aggregate %}
-        <p>Your aggregate score: {{ aggregate }}</p>
-    {% endif %}
-    {% if schoolQuery %}
-        <p>Showing school courses</p>
-    {% endif %}
-    {% if school %}
-        <p>Showing {{ school }}</p>
-    {% endif %}
+        <p>Courses Eligible</p>
+        {% if aggregate %}
+            <p>Your aggregate score: {{ aggregate }}</p>
+        {% endif %}
+        {% if schoolQuery %}
+            <p>Showing school courses</p>
+        {% endif %}
+        {% if school %}
+            <p>Showing {{ school }}</p>
+        {% endif %}
 
 
-    <table class="course-table table table-light-grey table-border">
-    <thead>
-        <tr>
-            <td>Course code</td>
-            <td>Course name</td>
-            {% if schoolQuery %}
+        <table class="course-table table table-light-grey table-border">
+            <thead>
+            <tr>
+
+                <td>Course code</td>
+                <td>Course name</td>
+                {% if not schoolQuery %}
                 <td>School name</td>
-            {% endif %}
-            <td>Polytechnic</td>
-            <td>Lower Bound</td>
-            <td>Upper Bound</td>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in eligibleCourses %}
-            <tr></tr>
-            <td><a href="{{ url_for('comments', comment=item[0]) }}">{{ item[0] }}</a></td>
-            <td>{{ item[1] }}</td>
-            {% if schoolQuery %}
-                <td>{{ item[2] }}</td>
-            {% endif %}
-            <td>{{ item[3] }}</td>
-            <td>{{ item[4] }}</td>
-            <td>{{ item[5] }}</td>
+                {% endif %}
+                <td>Polytechnic</td>
+                <td>Lower Bound</td>
+                <td>Upper Bound</td>
+
             </tr>
-        {% endfor %}
-    </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for item in eligibleCourses %}
+                <tr></tr>
+                {% if schoolQuery %}
+                <td><a href="{{ url_for('comments', comment=item[0]) }}">{{ item[0] }}</a></td>
+                <td>{{ item[1] }}</td>
+                <td>{{ item[2] }}</td>
+                <td>{{ item[3] }}</td>
+                <td>{{ item[4] }}</td>
+                {% else %}
+                <td><a href="{{ url_for('comments', comment=item[0]) }}">{{ item[0] }}</a></td>
+                <td>{{ item[1] }}</td>
+                <td>{{ item[2] }}</td>
+                <td>{{ item[3] }}</td>
+                <td>{{ item[4] }}</td>
+                <td>{{ item[5] }}</td>
+                {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-</body>
+    </body>
 
 {% endblock %}

@@ -447,7 +447,7 @@ def comments():
 
     courseDetails = db.find({'course_code': course_code}
                             , {'course_code': 1, 'course_name': 1, 'school_name': 1, 'polytechnic': 1, 'lower_bound': 1,
-                               'upper_bound': 1, '_id': 0})
+                               'upper_bound': 1, 'citizen_fee': 1, 'pr_fee': 1, 'foreigner_fee': 1,'_id': 0})
 
 
     # retrieve comments section
