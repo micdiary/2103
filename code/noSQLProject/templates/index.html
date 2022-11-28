@@ -5,117 +5,206 @@
 {% block main %}
 
 
+<body>
+    <nav class="navbar sticky-top navbar-light bg-light">
+        <ul>
+            <li><a href="/">Home</a></li>
+
+             {% if not login %}
+   
+            <li><a href="/login-form">Login</a></li>
+
+            <li><a href="/signup">Sign Up</a></li>
+
+            {% else %}
+            <li><a href={{ url_for('logout') }}>Logout</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 
     {% if not login %}
-        <form action="/login" method="post">
-            Username: <input name="username">
-            Password: <input name="password">
-            <input type="submit" id="login-attempt" name="login-attempt" value="login">
-        </form>
-        <form method="post">
-            <input type="submit" name="sign-up" value="signup">
-        </form>
     {% else %}
         <p> Welcome back {{ login }}</p>
-        <a href={{ url_for('logout') }}>logout</a>
     {% endif %}
-    <p>Eligible Courses based off your ELB2R2</p>
+
+    <!-- ELB2R2 form -->
+    <div class="section">
     <form method="post">
-        <table>
+        <p>Eligible Courses based off your ELB2R2</p>
+
+        <ul class="wrapper">
+            <h2>Steps:</h2>
+            <li class="icon steps">
+                <span class="tooltip">Select Polytechnic (you can choose more than one!)</span>
+                <span><p>1</p></span>
+              </li>
+            <li class="icon steps">
+                <span class="tooltip">Select Subjects</span>
+                <span><p>2</p></span>
+            </li>
+            <li class="icon steps">
+                <span class="tooltip">Enter Respective Grades</span>
+                <span><p>3</p></span>
+            </li>
+        </ul>
+
+        <table class="index-table table table-light-grey table-border">
             <tr>
-                <td></td>
-                <td>subjects</td>
-                <td>grades</td>
-            </tr>
-            <tr>
-                <td>EL</td>
                 <td>
-                    <input type="text" value="English" disabled>
+                    <input type="checkbox" name="NYP" value="NYP">
+                    <label for="NYP">Nanyang Polytechnic</label>
                 </td>
-                <td><input name="grade1" type="number" required></td>
-            </tr>
-            <tr>
-                <td>R1</td>
                 <td>
-                    <select id="R1" name="R1">
-                        <option value="eng">English</option>
-                        <option value="chi">Higher Mother Tongue</option>
-                    </select></td>
-
-                <td><input name="grade2" type="number" required></td>
-            </tr>
-            <tr>
-                <td>R2</td>
+                    <input type="checkbox" name="NP" value="NP">
+                    <label for="NYP">Ngee Ann Polytechnic</label>
+                </td>
                 <td>
-                    <select id="R2" name="R2">
-                        <option value="eng">English</option>
-                        <option value="chi">Higher Mother Tongue</option>
-                    </select></td>
-
-                <td><input name="grade3" type="number" required></td>
-            </tr>
-            <tr>
-                <td>B1</td>
+                    <input type="checkbox" name="SP" value="SP">
+                    <label for="NYP">Singapore Polytechnic</label>
+                </td>
                 <td>
-                    <select id="R3" name="R3">
-                        <option value="eng">English</option>
-                        <option value="chi">Higher Mother Tongue</option>
-                    </select></td>
-
-                <td><input name="grade4" type="number" required></td>
-            </tr>
-            <tr>
-                <td>B2</td>
+                    <input type="checkbox" name="RP" value="RP">
+                    <label for="NYP">Republic Polytechnic</label>
+                </td>
                 <td>
-                    <select id="R4" name="R4">
-                        <option value="eng">English</option>
-                        <option value="chi">Higher Mother Tongue</option>
-                    </select></td>
-
-                <td><input name="grade5" type="number" required></td>
+                    <input type="checkbox" name="TP" value="TP">
+                    <label for="NYP">Temasek Polytechnic</label>            
+                </td>
             </tr>
         </table>
 
-        <input type="checkbox" name="NYP" value="NYP">
-        <label for="NYP">Nanyang Polytechnic</label><br>
-        <input type="checkbox" name="NP" value="NP">
-        <label for="NYP">Ngee Ann Polytechnic</label><br>
-        <input type="checkbox" name="SP" value="SP">
-        <label for="NYP">Singapore Polytechnic</label><br>
-        <input type="checkbox" name="RP" value="RP">
-        <label for="NYP">Republic Polytechnic</label><br>
-        <input type="checkbox" name="TP" value="TP">
-        <label for="NYP">Temasek Polytechnic</label><br>
-        <input type="submit" id="eligible-course" name="eligible-course">
+        <table class="index-table table table-light-grey table-border">
+            <tr>
+                <td>Subjects</td>
+                <td>Grades</td>
+            </tr>
+            <tr>
+                <td>
+                    EL
+                    <input type="text" value="English" disabled>
+                </td>
+                <td><input name="grade1" type="number" placeholder="Enter grade..." required></td>
+            </tr>
+            <tr>
+                <td>
+                    R1 
+                    <select id="R1" name="R1">
+                        <option value="eng">English</option>
+                        <option value="chi">Higher Mother Tongue</option>
+                    </select>
+                </td>
+                <td><input name="grade2" type="number" placeholder="Enter grade..." required></td>
+            </tr>
+            <tr>
+                <td>
+                    R2
+                    <select id="R2" name="R2">
+                        <option value="eng">English</option>
+                        <option value="chi">Higher Mother Tongue</option>
+                    </select>
+                </td>
+                <td><input name="grade3" type="number" placeholder="Enter grade..." required></td>
+            </tr>
+            <tr>
+                <td>
+                    B1 
+                    <select id="R3" name="R3">
+                        <option value="eng">English</option>
+                        <option value="chi">Higher Mother Tongue</option>
+                    </select>
+                </td>
+                <td><input name="grade4" type="number"placeholder="Enter grade..."required></td>
+            </tr>
+            <tr>
+                <td>
+                    B2
+                    <select id="R4" name="R4">
+                        <option value="eng">English</option>
+                        <option value="chi">Higher Mother Tongue</option>
+                    </select>
+                </td>
+                <td><input name="grade5" type="number" placeholder="Enter grade..." required></td>
+            </tr>
+        </table>
+
+        <button type="submit" id="eligible-course" name="eligible-course" class="btn2 btn-sm">Submit</button>   
     </form>
+    </div>
 
+    <div class="section">
+    <!-- course form -->
+        <form method="post">
+            <p>Find courses from school</p>
+            <ul class="wrapper">
+                <h2>Steps:</h2>
+                <li class="icon steps">
+                    <span class="tooltip">Select Polytechnic</span>
+                    <span><p>1</p></span>
+                  </li>
+                <li class="icon steps">
+                    <span class="tooltip">Select School</span>
+                    <span><p>2</p></span>
+                </li>
+            </ul>
+    
+            <table class="index-table table table-light-grey table-border">
+                <tr>
+                    <td>
+                        Polytechnic: 
+                        <select name="poly" id="poly">
+                            <option value="" selected="selected">Select Polytechnic</option>
+                        </select>
+                    </td>
+                    <td>
+                        School: 
+                        <select name="school" id="school" required>
+                            <option value="" selected="selected">Please select polytechnic first</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+    
+            <button type="submit" id="school-course" name="school-course" class="btn2 btn-sm">Submit</button>    
+        </form>
+    </div>
 
-
-
-    <form method="post">
-        <p>Find courses from school</p>
-        Polytechnic: <select name="poly" id="poly">
-        <option value="" selected="selected">Select Polytechnic</option>
-    </select>
-        <br><br>
-        School: <select name="school" id="school" required>
-        <option value="" selected="selected">Please select polytechnic first</option>
-    </select>
-        <br><br>
-        <input type="submit" id="school-course" name="school-course">
-    </form>
+    <div class="section">
     <!-- scholarship form -->
-    <form method="post">
-        <p>Find scholarships from school</p>
-        Polytechnic: <select name="poly" id="poly2">
-        <option value="" selected="selected">Select Polytechnic</option>
-    </select>
-        <br><br>
-        School: <select name="school" id="school2" required>
-        <option value="" selected="selected">Please select polytechnic first</option>
-    </select>
-        <br><br>
-        <input type="submit" id="school-scholarship" name="school-scholarship">
-    </form>
+        <form method="post">
+            <p>Find scholarships from school</p>
+            <ul class="wrapper">
+                <h2>Steps:</h2>
+                <li class="icon steps">
+                    <span class="tooltip">Select Polytechnic</span>
+                    <span><p>1</p></span>
+                  </li>
+                <li class="icon steps">
+                    <span class="tooltip">Select School</span>
+                    <span><p>2</p></span>
+                </li>
+            </ul>
+    
+            <table class="index-table table table-light-grey table-border">
+                <tr>
+                    <td>
+                        Polytechnic: 
+                        <select name="poly" id="poly2">
+                            <option value="" selected="selected">Select Polytechnic</option>
+                        </select>
+                    </td>
+                    <td>
+                        School: 
+                        <select name="school" id="school2" required>
+                            <option value="" selected="selected">Please select polytechnic first</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+    
+            <button type="submit" id="school-scholarship" name="school-scholarship" class="btn2 btn-sm">Submit</button>    
+        </form>
+    </div>
+
+</body>
 {% endblock %}
 

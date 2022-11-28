@@ -1,53 +1,69 @@
 {% extends 'base.html' %}
 {% block main %}
+<body>
+    <nav class="navbar sticky-top navbar-light bg-light">
+        <ul>
+            <li><a href="/">Home</a></li>
+
+            {% if not login %}
+
+                <li><a href="/login-form">Login</a></li>
+
+                <li><a href="/signup">Sign Up</a></li>
+
+            {% else %}
+                <li><a href={{ url_for('logout') }}>Logout</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
     {% if not login %}
-        <form action="/login" method="post">
-            Username: <input name="username">
-            Password: <input name="password">
-            <input type="submit" id="login-attempt" name="login-attempt" value="login">
-        </form>
     {% else %}
         <p> Hi {{ login }}</p>
-        <a href={{ url_for('logout') }}>logout</a>
     {% endif %}
-    <title>Courses Eligible</title>
-    {% if aggregate %}
-        <p>Your aggregate score: {{ school }}</p>
-    {% endif %}
-    {% if schoolQuery %}
-        <p>Showing {{ schoolQuery }} courses</p>
-    {% endif %}
-    {% if school %}
-        <p>Showing {{ aggregate }}</p>
-    {% endif %}
-    <table>
-        <tr>
-            <td>Course name</td>
-            <td>Course code</td>
-            <td>Lower Bound</td>
-            <td>Upper Bound</td>
-            {% if not schoolQuery %}
-                <td>School name</td>
-            {% endif %}
-            <td>Polytechnic</td>
 
-        </tr>
+    <div class="section"></div>
+        <p>Courses Eligible</p>
+        {% if aggregate %}
+            <p>Your aggregate score: {{ school }}</p>
+        {% endif %}
+        {% if schoolQuery %}
+            <p>Showing {{ schoolQuery }} courses</p>
+        {% endif %}
+        {% if school %}
+            <p>Showing {{ aggregate }}</p>
+        {% endif %}
 
-        {% for dictItem in eligibleCourses %}
+
+        <table class="course-table table table-light-grey table-border">
+            <thead>
             <tr>
-                {% for key, value in dictItem.items() %}
-                    <td>
-                        {% if key == 'course_code' %}
-                            <a href="{{ url_for('comments', comment= value ) }}">{{ value }}</a>
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
-                    </td>
-                {% endfor %}
+                <td>Course name</td>
+                <td>Course code</td>
+                <td>Lower Bound</td>
+                <td>Upper Bound</td>
+                {% if not schoolQuery %}
+                    <td>School name</td>
+                {% endif %}
+                <td>Polytechnic</td>
+
             </tr>
-        {% endfor %}
-
-
-    </table>
+            </thead>
+            <tbody>
+            {% for dictItem in eligibleCourses %}
+                <tr>
+                    {% for key, value in dictItem.items() %}
+                        <td>
+                            {% if key == 'course_code' %}
+                                <a href="{{ url_for('comments', comment= value ) }}">{{ value }}</a>
+                            {% else %}
+                                {{ value }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
 {% endblock %}

@@ -1,28 +1,43 @@
 {% extends 'base.html' %}
 {% block main %}
     <body>
+    <nav class="navbar sticky-top navbar-light bg-light">
+        <ul>
+            <li><a href="/">Home</a></li>
+
+            {% if not login %}
+
+                <li><a href="/login-form">Login</a></li>
+
+                <li><a href="/signup">Sign Up</a></li>
+
+            {% else %}
+                <li><a href={{ url_for('logout') }}>Logout</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
     {% if not login %}
-        <form action="/login" method="post">
-            Username: <input name="username">
-            Password: <input name="password">
-            <input type="submit" id="login-attempt" name="login-attempt" value="login">
-        </form>
     {% else %}
         <p> Hi {{ login }}</p>
-        <a href={{ url_for('logout') }}>logout</a>
     {% endif %}
-    <table>
-        <tr>
-            <td>Course name</td>
-            <td>Course code</td>
-            <td>Lower Bound</td>
-            <td>Upper Bound</td>
-            <td>School name</td>
-            <td>Polytechnic</td>
-            <td>Citizen Fee</td>
-            <td>PR Fee</td>
-            <td>Non PR Fee</td>
-        </tr>
+
+    <div class="section">
+        <table class="course-table table table-light-grey table-border">
+            <thead>
+            <tr>
+                <td>Course code</td>
+                <td>Course name</td>
+                <td>School</td>
+                <td>Polytechnic</td>
+                <td>Lower Bound</td>
+                <td>Upper Bound</td>
+                <td>Citizen Fees</td>
+                <td>PR Fees</td>
+                <td>Non PR Fees</td>
+            </tr>
+            </thead>
+            <tbody>
         <tr>
             {% for dictItem in chosenCourse %}
 
@@ -33,93 +48,124 @@
                 {% endfor %}
             {% endfor %}
         </tr>
+        </tbody>
     </table>
-    <h2>Comment section</h2>
-    <table>
+    
+    <div class="comment-section">
+        <h3 class="mt-4">Comment section</h3>
+        <form method="post">
+            <div class="row">
+                <div class="col-sm-6">
+                    <label for="commentTextArea" class="form-label">Comment:</label>
+                    <textarea class="form-control" id="commentTextArea" rows="3" name="textbox"
+                            placeholder="Enter comment here..."></textarea>
+                </div>
+            </div>
+            <input type="hidden" name="course-code" value={{ courseID }}>
+            <div class="row">
+                <div class="col-sm-6 mt-2">
+                    <button class="btn btn-primary" type="submit">Post</button>
+                </div>
+            </div>
+        </form>
+
         {% set count =  [] %}
         {% for dictItem in courseComments %}
-            <tr>
+            <div class="row mt-4">
                 {% set idx = count|length %}
 
                 {% for key, value in dictItem.items() %}
 
-                    {% if key == 'description' %}
-                        <td>Description:</td>
-                        <td>{{ value }}</td>
-                    {% elif key == 'username' %}
-                        <td>Username:</td>
-                        <td>{{ value }}</td>
+                    {% if key == 'username' %}
+                        <div class="row">
+                            <div class="col commentUser">User: {{ value }}</div>
+                        </div>
                         {% if login == value %}
                             {% set saveCommentID = dictItem['_id']  %}
                         {% endif %}
+                    {% elif key == 'description' %}
+                        <div class="row">
+                            <div class="col comment">{{ value }}</div>
+                        </div>
+                    {% elif key == 'votesum' %}
+                    <div class="d-flex flex-row">
+                        <div class="row justify-content-start">
+                            <div class="col vote-text">Votes: {{ value }}</div>
+                        </div>
+                    </div>
                     {% elif key == '_id' %}
-
+                    <div class="d-flex flex-row">
+                        <div class="row justify-content-start">
                         {% if highlightVote %}
                             {% if highlightVote[idx] == 1 %}
-
-                                <form action="{{ url_for('upvote') }}" method="post">
-                                    <input type="hidden" name="upvote" value="{{ value }}">
-                                    <td><input type="submit" value="hightlightupvote"></td>
-                                </form>
-                                <form action="{{ url_for('downvote') }}" method="post">
-                                    <input type="hidden" name="downvote" value="{{ value }}">
-                                    <td><input type="submit" value="downvote"></td>
-                                </form>
+                                <div class="col">
+                                    <form action="{{ url_for('upvote') }}" method="post">
+                                        <input type="hidden" name="upvote" value="{{ value }}">
+                                        <button class="btn btn-success" type="submit" value="upvote">Upvote</button>
+                                    </form>
+                                </div>
+                                <div class="col">
+                                    <form action="{{ url_for('downvote') }}" method="post">
+                                        <input type="hidden" name="downvote" value="{{ value }}">
+                                        <button class="btn downvote" type="submit" value="downvote">Downvote</button>
+                                    </form>
+                                </div>
                             {% elif highlightVote[idx] == -1 %}
-                                <form action="{{ url_for('upvote') }}" method="post">
-                                    <input type="hidden" name="upvote" value="{{ value }}">
-                                    <td><input type="submit" value="upvote"></td>
-                                </form>
-
-                                <form action="{{ url_for('downvote') }}" method="post">
-                                    <input type="hidden" name="downvote" value="{{ value }}">
-                                    <td><input type="submit" value="highlightdownvote"></td>
-                                </form>
+                                <div class="col">
+                                    <form action="{{ url_for('upvote') }}" method="post">
+                                        <input type="hidden" name="upvote" value="{{ value }}">
+                                        <button class="btn upvote" type="submit" value="upvote">Upvote</button>
+                                    </form>
+                                </div>
+                                <div class="col">
+                                    <form action="{{ url_for('downvote') }}" method="post">
+                                        <input type="hidden" name="downvote" value="{{ value }}">
+                                        <button class="btn btn-danger" type="submit" value="downvote">
+                                            Downvote
+                                        </button>
+                                    </form>
+                                </div>
                             {% else %}
-                                <form action="{{ url_for('upvote') }}" method="post">
-                                    <input type="hidden" name="upvote" value="{{ value }}">
-                                    <td><input type="submit" value="upvote"></td>
-                                </form>
-
-                                <form action="{{ url_for('downvote') }}" method="post">
-                                    <input type="hidden" name="downvote" value="{{ value }}">
-                                    <td><input type="submit" value="downvote"></td>
-                                </form>
+                                <div class="col">
+                                    <form action="{{ url_for('upvote') }}" method="post">
+                                        <input type="hidden" name="upvote" value="{{ value }}">
+                                        <button class="btn upvote" type="submit" value="upvote">Upvote</button>
+                                    </form>
+                                </div>
+                                <div class="col">
+                                    <form action="{{ url_for('downvote') }}" method="post">
+                                        <input type="hidden" name="downvote" value="{{ value }}">
+                                        <button class="btn downvote" type="submit" value="downvote">Downvote</button>
+                                    </form>
+                                </div>
                             {% endif %}
                         {% else %}
-                            <form action="{{ url_for('upvote') }}" method="post">
-                                <input type="hidden" name="upvote" value="{{ value }}">
-                                <td><input type="submit" value="upvote"></td>
-                            </form>
-
-                            <form action="{{ url_for('downvote') }}" method="post">
-                                <input type="hidden" name="downvote" value="{{ value }}">
-                                <td><input type="submit" value="downvote"></td>
-                            </form>
+                            <div class="col">
+                                <form action="{{ url_for('upvote') }}" method="post">
+                                    <input type="hidden" name="upvote" value="{{ value }}">
+                                    <button class="btn upvote" type="submit" value="upvote">Upvote</button>
+                                </form>
+                            </div>
+                            <div class="col">
+                                <form action="{{ url_for('downvote') }}" method="post">
+                                    <input type="hidden" name="downvote" value="{{ value }}">
+                                    <button class="btn downvote" type="submit" value="downvote">Downvote</button>
+                                </form>
+                            </div>
                         {% endif %}
-                    {% elif key == 'votesum' %}
-                        <td> Vote value:</td>
-                        <td>{{ value }}</td>
+                        </div>
+                    </div>
                     {% endif %}
-
                     {% if key == 'username' and login == value %}
                         <form action="{{ url_for('delete_comment') }}" method="post">
                         <input type="hidden" name="delComment" value={{ saveCommentID }}>
-                        <td><input type="submit" value="Delete Comment"></td>
+                        <button class="btn btn-secondary" type="submit" value="Delete Comment">Delete</button>
                         </form>
                     {% endif %}
 
                 {% endfor %}
                 {% set add = count.append(1) %}
-            </tr>
+            </div>
         {% endfor %}
-    </table>
-    <p>Enter your comments: </p>
-    <form method="post">
-<textarea rows="4" cols="50" name="textbox">
-Enter text here...</textarea>
-        <input type="hidden" name="course-code" value={{ courseID }}>
-        <input type="submit">
-    </form>
 
 {% endblock %}

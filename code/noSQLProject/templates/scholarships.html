@@ -2,33 +2,48 @@
 
 {% block main %}
 
+<body>
+    <nav class="navbar sticky-top navbar-light bg-light">
+        <ul>
+            <li><a href="/">Home</a></li>
+    
+            {% if not login %}
+       
+            <li><a href="/login-form">Login</a></li>
+    
+            <li><a href="/signup">Sign Up</a></li>
+    
+            {% else %}
+            <li><a href={{ url_for('logout') }}>Logout</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
     {% if not login %}
-        <form action="/login" method="post">
-            Username: <input name="username">
-            Password: <input name="password">
-            <input type="submit" id="login-attempt" name="login-attempt" value="login">
-        </form>
     {% else %}
         <p> Hi {{ login }}</p>
-        <a href={{ url_for('logout') }}>logout</a>
     {% endif %}
-    <body>
+
+
+    <div class="section">
     <p>showing scholarships offered by {{ school }}</p>
-    <table>
-        <tr>
-            <td>Scholarships</td>
-            <td>Criteria</td>
-        </tr>
-
-        {% for scholarships in scholarshipsOffered %}
+    <table class="course-table table table-light-grey table-border">
+        <thead>
             <tr>
-            {% for key, value in scholarships.items() %}
-                <td>{{ key }}</td>
-                <td>{{ value }}</td>
-            {% endfor %}
+                <td>Scholarships</td>
+                <td>Criteria</td>
             </tr>
-        {% endfor %}
-
+        </thead>
+        <tbody>
+            {% for scholarships in scholarshipsOffered %}
+                <tr>
+                {% for key, value in scholarships.items() %}
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
-
+</body>
 {% endblock %}
