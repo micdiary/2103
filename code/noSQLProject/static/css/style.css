@@ -444,4 +444,7 @@ select
     border: 2px solid black;
 
 }
-  
+footer p {
+    text-align: center;
+    font-size: 16px;
+}  
