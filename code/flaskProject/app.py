@@ -378,6 +378,8 @@ def comments():
                    "AND course_code = " + course_code + " " \
                                                         "GROUP BY V.comment_id " \
                                                         "ORDER BY comment_id ASC"
+
+
     commentData = json.loads(connectToDB(commentsSQLQuery))
     courseData = json.loads(connectToDB(courseSQLQuery))
     voteValues = json.loads(connectToDB(voteSQLQuery))
