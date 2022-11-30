@@ -10,11 +10,14 @@ Please do follow the structure of the files to populate database as codes are of
 
 ./Data
 - Contains datasets for the project
+
 ./SQL
 - Contains SQL files to populate MYSQL database
 - Run 2103_Create_Table.sql first ehn 2103_Dump.sql
+
 ./NOSQL
 - Contains python file to import data into mongodb
 - Run import.py
+
 ./code
 - 
