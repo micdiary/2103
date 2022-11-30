@@ -328,11 +328,11 @@ def downvote():
                 flash("downvote removed")
             else:
                 # update downvote if exists
-                upvoted = json.loads(connectToDB(
+                upvotedComment = json.loads(connectToDB(
                     "SELECT 1 FROM vote WHERE comment_id = %d AND user_id = %d AND vote_value = 1" % (
                     downvoted, userID)))
 
-                if downvoted:
+                if upvotedComment:
                     # update if vote from 1 to -1
                     updateUpvote = "UPDATE vote SET vote_value = -1 WHERE user_id = %d AND comment_id = %d;" % (
                         userID, downvoted)
@@ -340,7 +340,7 @@ def downvote():
                 else:
                     # insert new vote
                     insertVote = "INSERT INTO vote (user_id,vote_value,comment_id) VALUES (%d,%d,%d)" % (
-                    userID, -1, upvoted)
+                    userID, -1, downvoted)
                     connectToDB(insertVote)
 
                 flash("downvoted comment")
