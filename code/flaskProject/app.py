@@ -281,11 +281,22 @@ def upvote():
                 flash("upvote removed")
                 connectToDB(undoUpVote)
             else:
-                # update if vote exists
-                updateUpvote = "UPDATE vote SET vote_value = 1 WHERE user_id = %d AND comment_id = %d;" % (userID, upvoted)
+                downvoted = json.loads(connectToDB(
+                    "SELECT 1 FROM vote WHERE comment_id = %d AND user_id = %d AND vote_value = -1" % (upvoted, userID)))
+
+                if downvoted:
+                    # update if vote from -1 to 1
+                    updateUpvote = "UPDATE vote SET vote_value = 1 WHERE user_id = %d AND comment_id = %d;" % (
+                    userID, upvoted)
+                    connectToDB(updateUpvote)
+                else:
+                    #insert new vote
+                    insertVote = "INSERT INTO vote (user_id,vote_value,comment_id) VALUES (%d,%d,%d)" % (userID,1,upvoted)
+                    connectToDB(insertVote)
 
 
-                connectToDB(updateUpvote)
+
+
                 flash("upvoted comment")
 
             return redirect(request.referrer)
@@ -317,10 +328,21 @@ def downvote():
                 flash("downvote removed")
             else:
                 # update downvote if exists
-                updateUpvote = "UPDATE vote SET vote_value = -1 WHERE user_id = %d AND comment_id = %d;" % (
-                userID, downvoted)
+                upvoted = json.loads(connectToDB(
+                    "SELECT 1 FROM vote WHERE comment_id = %d AND user_id = %d AND vote_value = 1" % (
+                    downvoted, userID)))
 
-                connectToDB(updateUpvote)
+                if downvoted:
+                    # update if vote from 1 to -1
+                    updateUpvote = "UPDATE vote SET vote_value = -1 WHERE user_id = %d AND comment_id = %d;" % (
+                        userID, downvoted)
+                    connectToDB(updateUpvote)
+                else:
+                    # insert new vote
+                    insertVote = "INSERT INTO vote (user_id,vote_value,comment_id) VALUES (%d,%d,%d)" % (
+                    userID, -1, upvoted)
+                    connectToDB(insertVote)
+
                 flash("downvoted comment")
             return redirect(request.referrer)
         else:
