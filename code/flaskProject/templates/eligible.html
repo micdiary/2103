@@ -25,13 +25,13 @@
     <div class="section">
         <p>Courses Eligible</p>
         {% if aggregate %}
-            <p>Your aggregate score: {{ aggregate }}</p>
+            <p>Your aggregate score: {{ school }}</p>
         {% endif %}
         {% if schoolQuery %}
             <p>Showing school courses</p>
         {% endif %}
         {% if school %}
-            <p>Showing {{ school }}</p>
+            <p>Showing {{ aggregate }}</p>
         {% endif %}
 
 
