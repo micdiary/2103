@@ -1,4 +1,5 @@
 SIT ICT 2103 Assignment
+
 Team lead: Tan Ru Bin, 2101421@sit.singaporetech.edu.sg  
 Members: Chen Yan Jiun, 2102058@sit.singaporetech.edu.sg  
 Michael Ronny Chandiary, 2101491@sit.singaporetech.edu.sg  
@@ -20,4 +21,6 @@ Please do follow the structure of the files to populate database as codes are of
 - Run import.py
 
 ./code
-- 
+- flaskProject points to SQL implementation 
+- noSQLProject points to NoSQL implementation
+- install the relevant requirements found in the txt files
