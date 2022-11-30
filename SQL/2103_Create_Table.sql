@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS School (
     school_name varchar(255),
     poly_id int,
 	PRIMARY KEY (school_id),
-    FOREIGN KEY (poly_id) REFERENCES polytechnic(poly_id)
+    FOREIGN KEY (poly_id) REFERENCES polytechnic(poly_id) ON DELETE CASCADE
 );
 -- DROP TABLE Course;
 CREATE TABLE IF NOT EXISTS Course (
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS Course (
     lower_bound int,
 	upper_bound int,
 	PRIMARY KEY (course_id),
-    FOREIGN KEY (school_id) REFERENCES school(school_id)
+    FOREIGN KEY (school_id) REFERENCES school(school_id) ON DELETE CASCADE
 );
 
 -- DROP TABLE Scholarship;
@@ -53,8 +53,8 @@ CREATE TABLE IF NOT EXISTS School_Scholarship (
     school_id int NOT NULL,
 	scholarship_id int NOT NULL,
 	PRIMARY KEY (school_scholarship_id),
-	FOREIGN KEY (school_id) REFERENCES school(school_id),
-	FOREIGN KEY (scholarship_id) REFERENCES scholarship(scholarship_id)
+	FOREIGN KEY (school_id) REFERENCES school(school_id) ON DELETE CASCADE,
+	FOREIGN KEY (scholarship_id) REFERENCES scholarship(scholarship_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Scholarship_Criteria (
@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS Scholarship_Criteria (
 	scholarship_id int NOT NULL,
     criteria_id int NOT NULL,
 	PRIMARY KEY (scholarship_criteria_id),
-	FOREIGN KEY (scholarship_id) REFERENCES scholarship(scholarship_id),
-    FOREIGN KEY (criteria_id) REFERENCES criteria(criteria_id)
+	FOREIGN KEY (scholarship_id) REFERENCES scholarship(scholarship_id) ON DELETE CASCADE,
+    FOREIGN KEY (criteria_id) REFERENCES criteria(criteria_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Users (
@@ -79,8 +79,8 @@ CREATE TABLE IF NOT EXISTS Comments (
     course_id int NOT NULL,
     user_id int NOT NULL,
 	PRIMARY KEY (comment_id),
-	FOREIGN KEY (course_id) REFERENCES Course(course_id),
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+	FOREIGN KEY (course_id) REFERENCES Course(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Vote (
@@ -89,6 +89,6 @@ CREATE TABLE IF NOT EXISTS Vote (
     comment_id int NOT NULL,
     vote_value int NOT NULL,
 	PRIMARY KEY (vote_id),
-	FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    FOREIGN KEY (comment_id) REFERENCES criteria(criteria_id)
+	FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES criteria(criteria_id) ON DELETE CASCADE
 );
